@@ -1,0 +1,38 @@
+{
+  "major_categories": [
+    "Phonology",
+    "Morphology",
+    "Syntax",
+    "Semantics",
+    "Norms"
+  ],
+  "sub_categories": [
+    "Phonological System",
+    "Phonological Alternation",
+    "Part-of-Speech",
+    "Morpheme",
+    "Word Formation",
+    "Sentence Structure",
+    "Syntactic Features",
+    "Vocabulary",
+    "Lexical Semantics",
+    "Pragmatics",
+    "Orthography",
+    "Standard Language",
+    "Standard Pronunciation",
+    "Loanword Orthography",
+    "Romanization",
+    "Cross-Category"
+  ],
+  "data_srcs": [
+    "NUAT(HS1)",
+    "NUAT(HS2)",
+    "NUAT(HS3)",
+    "CSAT",
+    "HSQE",
+    "LCSE(G9)",
+    "LCSE(G7)",
+    "NCSE(G9)",
+    "NCSE(G7)"
+  ]
+}

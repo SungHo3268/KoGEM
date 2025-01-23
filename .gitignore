@@ -1,0 +1,8 @@
+__pycache__/
+.idea/
+.DS_Store
+datasets/
+api_tokens/
+*_token.txt
+*_key.txt
+*_url.txt
