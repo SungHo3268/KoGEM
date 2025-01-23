@@ -8,4 +8,4 @@
 
 
 ## Zero-shot Results for Each Subcategory
-<img src='analysis/assets/figures/subcategory_results.png' width='90%'>
+<img src='analysis/assets/figures/subcategory_results.png' width='100%'>
