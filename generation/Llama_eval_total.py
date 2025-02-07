@@ -18,7 +18,7 @@ kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
 ################################
 #      Call Llama Client      #
 ################################
-access_token = open("utils/llama_token.txt", "r").read().strip()
+access_token = open("api_tokens/llama_token.txt", "r").read().strip()
 
 client = OpenAI(
   api_key=access_token,

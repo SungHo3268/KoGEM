@@ -21,14 +21,14 @@ kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
 """
 model_variants: 'gpt-3.5-turbo-0125' || 'gpt-4o' || 'gpt-4-mini  ||  o1-preview  ||  o1-mini'
 """
-access_token = open("utils/openai_token.txt", "r").read().strip()
+access_token = open("api_tokens/openai_token.txt", "r").read().strip()
 client = OpenAI(api_key=access_token)
 
 # model_var = "gpt-3.5-turbo-0125"
 # model_var = "gpt-4o"
-# model_var = "gpt-4o-mini"
+model_var = "gpt-4o-mini"
 # model_var = "o1-preview"
-model_var = "o1-mini"
+# model_var = "o1-mini"
 
 
 ################################

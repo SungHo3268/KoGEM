@@ -18,19 +18,25 @@ ClovaX
 : HCX-DASH-001  ||  HCX-003
 
 [ HF CALL ]
+llama-3-Korean-Bllossom-8B
+SOLAR-10.7B-Instruct-v1.0
+KULLM3
+EEVE-Korean-10.8B-v1.0
+EEVE-Korean-Instruct-10.8B-v1.0
 EXAONE-3.0-7.8B-Instruct
 EXAONE-3.5-7.8B-Instruct
 EXAONE-3.5-32B-Instruct
-llama-3-Korean-Bllossom-8B
-SOLAR-10.7B-Instruct-v1.0
-EEVE-Korean-10.8B-v1.0
-EEVE-Korean-Instruct-10.8B-v1.0
-KULLM3
+gemma-2-9b-it
+gemma-2-27b-it
+Qwen2.5-7B-Instruct
+Qwen2.5-14B-Instruct
 Qwen2.5-32B-Instruct
+DeepSeek-R1-Distill-Qwen-14B
+Llama-3.1-8B-Instruct
 """
 
-model_type = "ClovaX"
-model_var = "HCX-003"
+model_type = "OpenAI"
+model_var = "gpt-4o-mini"
 eval_method = "0"          # 0, 1, 5, 'each_major_one', 'each_sub_one'
 cot = False
 cot_file_index = "_cot" if cot else ""
@@ -42,18 +48,21 @@ else:
     dataset = json.load(open(f"logs/{model_type}/{eval_method}_shot{cot_file_index}_predictions.json", "r"))
 
 
+kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
+major = kogem_info["major_categories"]
+sub = kogem_info["sub_categories"]
+major_sub_map = kogem_info["major_sub_map"]
 
-major = ["음운론", "형태론", "통사론", "의미론", "규범", "복합"]
-sub = ["음운체계", "음운변동", "형태소", "품사", "단어의 짜임", "문장의 짜임", "문법요소", "단순어휘", "어휘의미론", "화용론",
-       "표준어", "맞춤법", "로마자표기법", "표준발음법", "외래어표기법", "규범 복합", "복합"]
-
-major_sub_map = {"음운론": ["음운체계", "음운변동"],
-                 "형태론": ["형태소", "품사", "단어의 짜임"],
-                 "통사론": ["문장의 짜임", "문법요소"],
-                 "의미론": ["단순어휘", "어휘의미론", "화용론"],
-                 "규범": ["표준어", "맞춤법", "로마자표기법", "표준발음법", "외래어표기법", "규범 복합"],
-                 "복합": ["복합"]
-                 }
+# major = ["음운론", "형태론", "통사론", "의미론", "규범", "복합"]
+# sub = ["음운체계", "음운변동", "형태소", "품사", "단어의 짜임", "문장의 짜임", "문법요소", "단순어휘", "어휘의미론", "화용론",
+#        "표준어", "맞춤법", "로마자표기법", "표준발음법", "외래어표기법", "규범 복합", "복합"]
+# major_sub_map = {"음운론": ["음운체계", "음운변동"],
+#                  "형태론": ["형태소", "품사", "단어의 짜임"],
+#                  "통사론": ["문장의 짜임", "문법요소"],
+#                  "의미론": ["단순어휘", "어휘의미론", "화용론"],
+#                  "규범": ["표준어", "맞춤법", "로마자표기법", "표준발음법", "외래어표기법", "규범 복합"],
+#                  "복합": ["복합"]
+#                  }
 
 major_results = {cat: [0, 0] for cat in major}
 sub_results = {cat: [0, 0] for cat in sub}
@@ -90,31 +99,34 @@ for maj in major_sub_map:
     for sub in major_sub_map[maj]:
         cor, total = sub_results[sub]
         print(f"{cor/total*100:.2f}", end="\t")
-        if maj in ["음운론", "형태론", "통사론"]:
+        # if maj in ["음운론", "형태론", "통사론"]:
+        if maj in ["Phonology", "Morphology", "Syntax"]:
             firs_line += f"{cor/total*100:.2f}\t"
         else:
             second_line += f"{cor/total*100:.2f}\t"
 
     major = major_results[maj]
     only_major += f"{major[0] / major[1] * 100:.2f}\t"
-    if maj == '복합':
+    # if maj == '복합':
+    if maj == 'Mixed':
         print("")
     else:
         cor, total = major_results[maj]
         print(f"{cor/total*100:.2f}")
-        if maj in ["음운론", "형태론", "통사론"]:
+        if maj in ["Phonology", "Morphology", "Syntax"]:
             firs_line += f"{cor/total*100:.2f}\t"
         else:
             second_line += f"{cor/total*100:.2f}\t"
 
 print(f"\n총계: {sum([major_results[cat][0] for cat in major_results])/sum([major_results[cat][1] for cat in major_results])*100:.2f}")
-print(f"총계 (w/o 복합): {sum([major_results[cat][0] for cat in major_results if cat != '복합'])/sum([major_results[cat][1] for cat in major_results if cat != '복합'])*100:.2f}\n\n")
+# print(f"총계 (w/o 복합): {sum([major_results[cat][0] for cat in major_results if cat != '복합'])/sum([major_results[cat][1] for cat in major_results if cat != '복합'])*100:.2f}\n\n")
+print(f"총계 (w/o 복합): {sum([major_results[cat][0] for cat in major_results if cat != 'Mixed'])/sum([major_results[cat][1] for cat in major_results if cat != 'Mixed'])*100:.2f}\n\n")
 second_line += f"{sum([major_results[cat][0] for cat in major_results])/sum([major_results[cat][1] for cat in major_results])*100:.2f}"
 only_major += f"{sum([major_results[cat][0] for cat in major_results])/sum([major_results[cat][1] for cat in major_results])*100:.2f}"
 
 print(f"For Excel Copy-Paste")
-print(firs_line[:-1])
-print(second_line)
+print(firs_line+second_line)
+# print(second_line)
 print(only_major)
 
 

@@ -29,7 +29,8 @@ results = {model: results[model] for model in sorted_models if model in results}
 
 
 fig, ax = plt.subplots(figsize=(12, 10), subplot_kw=dict(polar=True))
-ax.set_facecolor("#f2f2f5")  # Set seaborn's default background color
+# ax.set_facecolor("#f2f2f5")             # Set seaborn's default background color
+ax.set_facecolor("#f7f7fa")             # Set seaborn's default background color
 ax.set_theta_zero_location("N")         # N for North
 ax.set_theta_direction(-1)              # -1 for counterclockwise
 
@@ -58,12 +59,12 @@ for (model_name, values), color, alpha in zip(results.items(), colors, alphas):
 
 # Set xlabels
 ax.set_xticks(angles[:-1])
-ax.set_xticklabels(categories, fontsize=18,
-                   )
+# ax.set_xticklabels(categories, fontsize=18)
+ax.set_xticklabels([' ' for _ in range(len(categories))], fontsize=18)
 
 # Set ylabels
 ax.set_yticks([20, 40, 60, 80, 100])
-ax.set_yticklabels(["20", "40", "60", "80", "100"], fontsize=14, color="black")
+ax.set_yticklabels(["20", "40", "60", "80", "100"], fontsize=16, color="black")
 ax.set_ylim(20, 100)
 
 # Set polar axis visible
@@ -78,7 +79,7 @@ new_labels = labels[: 1] + labels[2:] + labels[1:2]
 plt.legend(
     fontsize=12,
     loc='upper right',
-    bbox_to_anchor=(1.2, 1.2),  # Move legend to the right outside the plot
+    bbox_to_anchor=(1.1, 1.1),  # Move legend to the right outside the plot
     fancybox=True,
     shadow=True,
     frameon=True,
@@ -88,5 +89,5 @@ plt.legend(
 
 # 차트 표시
 plt.tight_layout()
-# plt.savefig("analysis/assets/figures/main_v0.3.pdf")
+plt.savefig("analysis/assets/figures/main_pentagon_v7.pdf")
 plt.show()

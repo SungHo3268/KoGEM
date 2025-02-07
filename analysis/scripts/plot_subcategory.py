@@ -1,15 +1,15 @@
 """
 This file yields the Figure 4 in KoGEM paper
 """
-import os
 import json
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 sns.set_style("whitegrid", {"grid.color": "gray", "grid.linewidth": 1.5})
-
 
 # Load basic information for KoGEM benchmark
 kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
@@ -33,7 +33,6 @@ machine_data.drop(columns=['Mean Score'], inplace=True)
 melted_data = machine_data.melt(id_vars=['Model'], var_name='Category', value_name='Score')
 filtered_positive_data = melted_data[melted_data['Score'] > 0]
 
-
 # Map refined colors to the filtered data
 filtered_positive_data['Color'] = filtered_positive_data['Category'].map(color_map)
 
@@ -42,15 +41,14 @@ highlight_models = list(top_3_models)
 
 # Define distinct markers for the top-3 models and Human
 refined_model_markers = {
-    'o1-preview': 'D',  # Diamond
-    'Claude-3.5-Sonnet': 'P',  # Plus
-    'GPT-4o': 's',      # Square
+    'o1-preview': {'marker': 'D', 'color': '#1F4E79'},          # Diamond, distinct dark blue
+    'Claude-3.5-Sonnet': {'marker': 'P', 'color': '#357ABD'},   # Plus, medium blue
+    'GPT-4o': {'marker': 's', 'color': '#3E70FF'}               # Square, distinct blue
 }
 
 # Calculate the mean scores for top-3 models and Human for each category
 top_3_means = machine_data[machine_data['Model'].isin(top_3_models)].drop(columns=['Model']).mean()
 human_mean = human_data.drop(columns=['Model']).mean()
-
 
 # Plot refined box plot
 plt.figure(figsize=(24, 10))  # Wider aspect ratio for a more professional layout
@@ -70,7 +68,6 @@ for p, patch in enumerate(box.patches):
     patch.set_edgecolor("gray")
     patch.set_linewidth(1.5)
 
-
 # Overlay points for all machine models (excluding Human and top-3) with smaller markers
 plt.scatter(
     x=np.tile(np.arange(len(top_3_means)), len(machine_data[~machine_data['Model'].isin(top_3_models)])),
@@ -78,15 +75,17 @@ plt.scatter(
     label='Other LLMs',
     s=50,  # Smaller marker size
     marker='o',
-    color=[color_map[cat] for cat in machine_data.drop(columns=['Model']).columns] * len(machine_data[~machine_data['Model'].isin(top_3_models)]),
+    color=[color_map[cat] for cat in machine_data.drop(columns=['Model']).columns] * len(
+        machine_data[~machine_data['Model'].isin(top_3_models)]),
     edgecolor="gray",
     alpha=0.7
 )
 
-
 # Overlay points for top 3 models and Human with refined markers and sizes
 for model in highlight_models:
-    marker = refined_model_markers.get(model, 'o')  # Default to circle if marker not defined
+    model_config = refined_model_markers.get(model, {'marker': 'o', 'color': '#1E90FF'})  # Default marker and color
+    marker = model_config['marker']
+    color = model_config['color']
 
     model_scores = machine_data[machine_data['Model'] == model].drop(columns=['Model']).values.flatten()
     positive_scores = model_scores[(model_scores > 0) & (model_scores <= 100)]
@@ -97,10 +96,9 @@ for model in highlight_models:
         s=150,
         marker=marker,
         edgecolors='black',
-        color='#1E90FF',  # Dodger Blue
+        color=color,
         alpha=0.9
     )
-
 
 # Calculate overall average scores for all machine models
 all_machine_mean = machine_data.drop(columns=['Model']).mean()
@@ -132,7 +130,6 @@ plt.tick_params(axis='y', direction='out', length=6)
 plt.ylabel('Score', fontsize=18, fontweight='bold')  # Increase y-axis label font size
 plt.grid(axis='y', linestyle='--', linewidth=0.8, alpha=0.7, color='gray')
 
-
 handles, labels = plt.gca().get_legend_handles_labels()
 new_handles = handles[1: 4] + handles[:1] + handles[4:]
 new_labels = labels[1: 4] + labels[:1] + labels[4:]
@@ -156,10 +153,9 @@ plt.gca().spines['right'].set_visible(False)
 plt.gca().spines['bottom'].set_color('black')
 plt.gca().spines['left'].set_color('black')
 
-
-# Save the figure as a transparent PNG file
+# Save the figure
 save_dir = "analysis/assets/figures/"
 os.makedirs(save_dir, exist_ok=True)
-# plt.savefig(os.path.join(save_dir, "subcategory_v0.6.pdf"), format='png', dpi=300, bbox_inches='tight', transparent=True)
+plt.savefig(os.path.join(save_dir, "subcategory_v0.7.pdf"), format='png', dpi=300, bbox_inches='tight', transparent=True)
 plt.show()
 plt.close()

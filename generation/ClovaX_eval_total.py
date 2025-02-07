@@ -56,12 +56,14 @@ class ChatCompletionExecutor:
             return res
 
 
+clova_x_tokens = json.load(open("api_tokens/clovax_chat_api_key.txt", "r"))
+
 model_var = "HCX-DASH-001"          # 'HCX-DASH-001' || 'HCX-003'
 chat_completion_executor = ChatCompletionExecutor(
             host='https://clovastudio.stream.ntruss.com',
-            api_key='NTA0MjU2MWZlZTcxNDJiY6RwvAzX+D21GTpaNG276PGB64aDXtyA0k35Ezr25Dpj',
-            api_key_primary_val='JmH9YTPiNjnz9aQxyLTMPwPeIeQ46tWimn1cFssk',
-            request_id='7ec0cf16-dba2-4da4-acb5-121544436a46',
+            api_key=clova_x_tokens["api_key"],
+            api_key_primary_val=clova_x_tokens["api_key_primary_val"],
+            request_id=clova_x_tokens["request_id"],
             model_var=model_var
         )
 

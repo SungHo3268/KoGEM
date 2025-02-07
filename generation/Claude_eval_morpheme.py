@@ -2,30 +2,29 @@ import os
 import sys
 import json
 import random
-from g2pk import G2p
+import anthropic
 from tqdm import tqdm
-from openai import OpenAI
+from kiwipiepy import Kiwi
 sys.path.append(os.getcwd())
 from srcs.functions import init_random
 
 init_random(42)
-g2p = G2p()
+
+kiwi = Kiwi()
 
 
 ################################
-#      Call OpenAI Client      #
+#      Call Claude Client      #
 ################################
 """
-model_variants: 'gpt-3.5-turbo-0125' || 'gpt-4o' || 'gpt-4-mini'
+                          Fastest                       Fast                   Moderately fast                      Fast
+model_variants: 'claude-3-haiku-20240307' || 'claude-3-sonnet-20240229' || 'claude-3-opus-20240229'   ||   'claude-3-5-sonnet-20240620'
 """
-access_token = open("api_tokens/openai_token.txt", "r").read().strip()
-client = OpenAI(api_key=access_token)
+access_token = open("api_tokens/claude_token.txt", "r").read().strip()
 
-# model_var = "gpt-3.5-turbo-0125"
-# model_var = "gpt-4o"
-# model_var = "gpt-4o-mini"
-model_var = "o1-preview"
-# model_var = "o1-mini"
+client = anthropic.Anthropic(api_key=access_token)
+
+model_var = "claude-3-5-sonnet-20240620"
 
 
 ################################
@@ -49,7 +48,7 @@ batch_num = len(total_dataset) // batch_size + 1
 ################################
 max_tokens = 110
 
-output_dir = f"logs/OpenAI/"
+output_dir = f"logs/Claude/"
 os.makedirs(output_dir, exist_ok=True)
 
 
@@ -67,7 +66,7 @@ for i in range(batch_num):
     for n, data in tqdm(enumerate(dataset), total=len(dataset),
                         desc=f"({i+1}/{batch_num}) th Generating answers using '{model_var}' model with 0-shot eval...",
                         bar_format="{l_bar}{bar:15}{r_bar}"):
-        if data["level_1"] != "Phonology":
+        if data["level_1"] != "Morphology":
             continue
 
         if data['data_src'] in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)', 'CSAT']:
@@ -81,7 +80,11 @@ for i in range(batch_num):
         context = data['context'].strip()
         paragraph = data['paragraph'].strip()
         candidates = [cand.strip() for cand in data['candidates']]
-        candidates = [cand + f" (발음: {g2p(cand)})" for cand in candidates]
+        # candidates = [cand + f" (형태소: {[tok_set.form for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]                                       # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요', ',', '반갑', '습니다', '.'])"
+        # candidates = [cand + f" (형태소: {[tok_set.form + '(' + tok_set.tag + ')'  for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]            # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요(NNP)', ',(SP)', '반갑(VA-I)', '습니다(EF)', '.(SF)'])"
+        # candidates = [cand + f" (형태소: {', '.join([tok_set.form for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]                            # '안녕하세요, 반갑습니다. (형태소: 안녕하세요, ,, 반갑, 습니다, .)'
+        # candidates = [cand + f" (형태소: {'/'.join([tok_set.form for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]                             # '안녕하세요, 반갑습니다. (형태소: 안녕하세요/,/반갑/습니다/.)'
+        candidates = [cand + f" (형태소: {'/'.join([tok_set.form + '(' + tok_set.tag + ')' for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]   # '안녕하세요, 반갑습니다. (형태소: 안녕하세요(NNP)/,(SP)/반갑(VA-I)/습니다(EF)/.(SF))'
         candidates = "\n ".join(candidates)
 
         # prompt
@@ -114,34 +117,20 @@ for i in range(batch_num):
         while prediction == '' and num_repeat < 5:
             messages = [
                 {
-                    "role": "system",
-                    "content": pre_prompt,
-                },
-                {
                     "role": "user",
                     "content": prompt,
                 }
             ]
 
-            if "o1" in model_var:
-                for m, message in enumerate(messages):
-                    if message["role"] == "system":
-                        messages[m]["role"] = "user"
-                response = client.chat.completions.create(
-                    messages=messages,
-                    model=model_var,
-                    seed=123,
-                )
-            else:
-                response = client.chat.completions.create(
-                    messages=messages,
-                    model=model_var,
-                    seed=123,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                )
+            response = client.messages.create(
+                system=pre_prompt,
+                messages=messages,
+                model=model_var,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
 
-            generated_text = response.choices[0].message.content
+            generated_text = [response.content[j].text for j in range(len(response.content))][0]
             for char in generated_text:
                 if char.isnumeric() and char in [str(n) for n in range(cand_num, 0, -1)]:
                     prediction = char
@@ -171,37 +160,34 @@ for i in range(batch_num):
     #       Save the Predictions      #
     ###################################
     json.dump(dataset,
-              open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_phonology.json"), "w", encoding="utf-8"),
+              open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_morphology.json"), "w", encoding="utf-8"),
               ensure_ascii=False,
               indent=2
               )
-
-    # print("Predictions are saved.")
-    # print("Done.")
 
 
 # Aggregate all saved files
 all_dataset = []
 for i in range(batch_num):
-    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_phonology.json"), "r"))
+    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_morphology.json"), "r"))
     all_dataset.extend(dataset)
 
-phonology_dataset = []
+morphology_dataset = []
 for data in all_dataset:
-    if data["level_1"] == "Phonology":
-        phonology_dataset.append(data)
+    if data["level_1"] == "Morphology":
+        morphology_dataset.append(data)
 
 
-print(f"Zero-shot Accuracy: {acc / len(phonology_dataset) * 100:.2f} [%]")
-json.dump(phonology_dataset,
-            open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_phonology.json"), "w", encoding="utf-8"),
+print(f"Zero-shot Accuracy: {acc / len(morphology_dataset) * 100:.2f} [%]")
+json.dump(morphology_dataset,
+            open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_morphology.json"), "w", encoding="utf-8"),
             ensure_ascii=False,
             indent=2
             )
 
 # remove previous files
 for i in range(batch_num):
-    os.remove(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_phonology.json"))
+    os.remove(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_morphology.json"))
 
 print("All predictions are saved.")
 print("Done.")

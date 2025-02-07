@@ -70,8 +70,8 @@ ax1.bar(x_hsqe_offset, values_hsqe, width=4, alpha=0.7, label="HSQE Accuracy", c
 ax1.bar(x_cse_offset, values_cse, width=4, alpha=0.7, label="CSE Accuracy", color="orange", align="center")
 
 # Set labels for the primary y-axis
-ax1.set_xlabel("Age Groups", fontsize=14)
-ax1.set_ylabel("Accuracy (%)", fontsize=14)
+ax1.set_xlabel("Age Groups", fontsize=18)
+ax1.set_ylabel("Accuracy (%)", fontsize=18)
 # ax1.set_title("HSQE and CSE with Participants Overlay")
 
 
@@ -84,24 +84,25 @@ ax2.fill_between(x_hsqe_smooth, 0, y_hsqe_smooth, color="blue", alpha=0.2)
 ax2.plot(x_cse_smooth, y_cse_smooth, color="red", linewidth=2, label="CSE Participants")
 # ax2.scatter(x_cse_acc, y_cse_acc, color="red", zorder=5, label="CSE Data Points")
 ax2.fill_between(x_cse_smooth, 0, y_cse_smooth, color="red", alpha=0.2)
-ax2.set_ylabel("Number of Participants", fontsize=14)
+ax2.set_ylabel("Number of Participants", fontsize=18)
 ax2.spines["right"].set_position(("axes", 1.0))
 ax2.set_ylim(bottom=0)
 
 # Combine legends
 lines_labels = ax1.get_legend_handles_labels()
 lines_labels_2 = ax2.get_legend_handles_labels()
-ax1.legend(lines_labels[0] + lines_labels_2[0], lines_labels[1] + lines_labels_2[1], loc="upper right")
+ax1.legend(lines_labels[0] + lines_labels_2[0], lines_labels[1] + lines_labels_2[1],
+           loc="upper right", fontsize=14)
 
 # Set x-axis ticks
 ax1.set_xticks(sorted(set(x_hsqe + x_cse)))
-ax1.set_xticklabels([f"{x}s" for x in sorted(set(x_hsqe + x_cse))], fontsize=12)
+ax1.set_xticklabels([f"{x}s" for x in sorted(set(x_hsqe + x_cse))], fontsize=14)
 
-ax1.tick_params(axis='y', labelsize=12)
-ax2.tick_params(axis='y', labelsize=12)
+ax1.tick_params(axis='y', labelsize=14)
+ax2.tick_params(axis='y', labelsize=14)
 
 # Display plot
 plt.tight_layout()
-# plt.savefig("analysis/assets/figures/human_statistics.pdf")
+plt.savefig("analysis/assets/figures/human_statistics_v2.pdf")
 plt.show()
 

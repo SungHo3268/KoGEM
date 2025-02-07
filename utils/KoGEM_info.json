@@ -34,5 +34,65 @@
     "LCSE(G7)",
     "NCSE(G9)",
     "NCSE(G7)"
-  ]
+  ],
+  "major_sub_map": {
+    "Phonology": [
+      "Phonological System",
+      "Phonological Alternation"
+    ],
+    "Morphology": [
+      "Part-of-Speech",
+      "Morpheme",
+      "Word Formation"
+    ],
+    "Syntax": [
+      "Sentence Structure",
+      "Syntactic Features"
+    ],
+    "Semantics": [
+      "Vocabulary",
+      "Lexical Semantics",
+      "Pragmatics"
+    ],
+    "Norms": [
+      "Orthography",
+      "Standard Language",
+      "Standard Pronunciation",
+      "Loanword Orthography",
+      "Romanization",
+      "Cross-Category"
+    ]
+  },
+  "convert_into_eng": {
+    "mock_high1": "NUAT(HS1)",
+    "mock_high2": "NUAT(HS2)",
+    "mock_high3": "NUAT(HS3)",
+    "suneung": "CSAT",
+    "school_qual_exam": "HSQE",
+    "local_office9": "LCSE(G9)",
+    "local_office7": "LCSE(G7)",
+    "national_office9": "NCSE(G9)",
+    "national_office7": "NCSE(G7)",
+    "음운론": "Phonology",
+    "음운체계": "Phonological System",
+    "음운변동": "Phonological Alternation",
+    "형태론": "Morphology",
+    "품사": "Part-of-Speech",
+    "형태소": "Morpheme",
+    "단어의 짜임": "Word Formation",
+    "통사론": "Syntax",
+    "문장의 짜임": "Sentence Structure",
+    "문법요소": "Syntactic Features",
+    "의미론": "Semantics",
+    "단순어휘": "Vocabulary",
+    "어휘의미론": "Lexical Semantics",
+    "화용론": "Pragmatics",
+    "규범": "Norms",
+    "맞춤법": "Orthography",
+    "표준어": "Standard Language",
+    "표준발음법": "Standard Pronunciation",
+    "외래어표기법": "Loanword Orthography",
+    "로마자표기법": "Romanization",
+    "규범 복합": "Cross-Category"
+  }
 }

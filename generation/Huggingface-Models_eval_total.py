@@ -1,6 +1,6 @@
 import os
 import sys
-# os.environ["CUDA_VISIBLE_DEVICES"] = "2,3"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 # os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
 
 import json
@@ -26,7 +26,7 @@ kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
 
 def get_tokenizer_and_model(torch_model_name):
     if 'KoGPT' in torch_model_name:
-        access_token = open("utils/hf_token.txt", "r").read().strip()
+        access_token = open("api_tokens/hf_token.txt", "r").read().strip()
         tokenizer = AutoTokenizer.from_pretrained(
             'kakaobrain/kogpt', revision='KoGPT6B-ryan1.5b-float16',  # or float32 version: revision=KoGPT6B-ryan1.5b
             bos_token='[BOS]', eos_token='[EOS]', unk_token='[UNK]', pad_token='[PAD]', mask_token='[MASK]',
@@ -80,8 +80,7 @@ def get_tokenizer_and_model(torch_model_name):
             )
         elif (('llama-3' in torch_model_name.lower()) or
               ('KORani-v1' in torch_model_name) or ('KORani-v3' in torch_model_name) or
-              ('KULLM3' in torch_model_name) or
-              ('gemma' in torch_model_name)):
+              ('KULLM3' in torch_model_name)):
             model = AutoModelForCausalLM.from_pretrained(
                 torch_model_name,
                 torch_dtype=torch.float16,
@@ -101,10 +100,23 @@ def get_tokenizer_and_model(torch_model_name):
                 device_map="auto",
                 trust_remote_code=True,
             )
+        elif 'deepseek' in args.torch_model_name:       # It must be located in advance of Qwen.
+            model = AutoModelForCausalLM.from_pretrained(
+                torch_model_name,
+                torch_dtype="auto",
+                device_map="auto",
+                pad_token_id=tokenizer.eos_token_id,
+            )
         elif 'Qwen' in torch_model_name:
             model = AutoModelForCausalLM.from_pretrained(
                 torch_model_name,
                 torch_dtype="auto",
+                device_map="auto",
+            )
+        elif 'gemma' in torch_model_name or 'mistral' in torch_model_name:
+            model = AutoModelForCausalLM.from_pretrained(
+                torch_model_name,
+                torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
         else:
@@ -223,8 +235,7 @@ def make_prompts(args, data, examples):
 def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers):
     if (('llama-3' in args.torch_model_name.lower()) or
             ('KORani-v3' in args.torch_model_name) or
-            ('KULLM3' in args.torch_model_name) or
-            ('gemma' in args.torch_model_name)):
+            ('KULLM3' in args.torch_model_name)):
         if args.shot_num != 0:
             messages = [
                 {"role": "system",
@@ -256,6 +267,98 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                     {"role": "user",
                      "content": f"{prompt}"},
                 ]
+    elif 'gemma' in args.torch_model_name:
+        if args.shot_num != 0:
+            messages = [
+                {"role": "user",
+                 "content": f"{pre_prompt}"}
+            ]
+            for ex_prompt, ex_ans in zip(example_prompts, example_answers):
+                messages.extend([
+                    {"role": "assistant",
+                     "content": ex_prompt},
+                    {"role": "user",
+                     "content": ex_ans}
+                ])
+            messages.extend([
+                {"role": "assistant",
+                 "content": prompt},
+            ])
+        else:
+            if args.cot:
+                messages = [
+                    {"role": "user",
+                     "content": f"{pre_prompt + prompt_extended}"
+                     },
+                ]
+            else:
+                messages = [
+                    {"role": "user",
+                     "content": f"{pre_prompt + prompt}"},
+                ]
+    elif 'mistral' in args.torch_model_name:
+        if args.shot_num != 0:
+            messages = [
+                {"role": "system",
+                 "content": f"{pre_prompt}"}
+            ]
+            for ex_prompt, ex_ans in zip(example_prompts, example_answers):
+                messages.extend([
+                    {"role": "user",
+                     "content": ex_prompt},
+                    {"role": "assistant",
+                     "content": ex_ans}
+                ])
+            messages.extend([
+                {"role": "user",
+                 "content": prompt},
+            ])
+        else:
+            if args.cot:
+                messages = [
+                    {"role": "system",
+                     "content": f"{pre_prompt}"},
+                    {"role": "user",
+                     "content": f"{prompt_extended}"},
+                ]
+            else:
+                messages = [
+                    {"role": "system",
+                     "content": f"{pre_prompt}"},
+                    {"role": "user",
+                     "content": f"{prompt}"},
+                ]
+    elif 'deepseek' in args.torch_model_name:       # It must be located in advance of Qwen.
+        if args.shot_num != 0:
+            messages = [
+                {"role": "user",
+                 "content": f"{pre_prompt}"}
+            ]
+            for ex_prompt, ex_ans in zip(example_prompts, example_answers):
+                messages.extend([
+                    {"role": "user",
+                     "content": ex_prompt},
+                    {"role": "user",
+                     "content": ex_ans}
+                ])
+            messages.extend([
+                {"role": "user",
+                 "content": prompt},
+            ])
+        else:
+            if args.cot:
+                messages = [
+                    {"role": "user",
+                     "content": f"{pre_prompt + prompt_extended}"
+                     },
+                ]
+            else:
+                messages = [
+                    {"role": "user",
+                     "content": f"{pre_prompt + prompt}"},
+                ]
+        messages[-1]["content"] += f" 다른 과정 필요 없이, 최종 답변: [integer], 해설: [string] 형태의 한국어로만 답해줘. <think>\n"
+
     elif 'EXAONE' in args.torch_model_name or 'Qwen' in args.torch_model_name:
         if 'EXAONE' in args.torch_model_name:
             set_role = "You are EXAONE model from LG AI Research, a helpful assistant."
@@ -309,7 +412,7 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
     return messages
 
 
-def get_response(messages, model, tokenizer):
+def get_response(args, messages, model, tokenizer):
     if ('llama-3' in args.torch_model_name.lower()) or ('KORani-v3' in args.torch_model_name) or ('KULLM3' in args.torch_model_name):
         tokens = tokenizer.apply_chat_template(
             messages,
@@ -320,7 +423,6 @@ def get_response(messages, model, tokenizer):
             tokenizer.eos_token_id,
             tokenizer.convert_tokens_to_ids("<|eot_id|>")
         ]
-
         outputs = model.generate(
             tokens,
             max_new_tokens=args.max_new_tokens,
@@ -349,7 +451,6 @@ def get_response(messages, model, tokenizer):
             add_generation_prompt=True,
             return_tensors="pt"
         )
-
         outputs = model.generate(
             tokens.to(model.device),
             max_new_tokens=args.max_new_tokens,
@@ -364,17 +465,35 @@ def get_response(messages, model, tokenizer):
             cur_message_len = len(f"[|{message['role']}|]\n") + len(message['content'])
             input_len.append(cur_message_len)
         generated_text = generated[sum(input_len) + len(ender):].strip()
+    elif 'deepseek' in args.torch_model_name:       # It must be located in advance of Qwen.
+        text = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=1000,
+            temperature=0.6,
+            pad_token_id=tokenizer.eos_token_id
+            # do_sample=False
+        )
+        generated_ids = [
+            output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+        ]
+        generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     elif ('Qwen' in args.torch_model_name) or ('gemma' in args.torch_model_name):
         text = tokenizer.apply_chat_template(
             messages,
             tokenize=False,
-            add_generation_prompt=True
+            add_generation_prompt=True,
         )
         model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
         generated_ids = model.generate(
             **model_inputs,
             max_new_tokens=args.max_new_tokens,
-            temperature=1e-10,
+            temperature=1e-10 if 'Qwen' in args.torch_model_name else 0,
             # do_sample=False
         )
         generated_ids = [
@@ -413,6 +532,8 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
     with torch.no_grad():
         for i in range(batch_num):
             if args.continue_batch_num and i < args.continue_batch_num:
+                continue
+            if 15 < i < 66:
                 continue
 
             dataset = total_dataset[i * args.batch_size: (i+1) * args.batch_size]
@@ -457,26 +578,62 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                 cand_num, pre_prompt, prompt, prompt_extended, label, example_prompts, example_answers = make_prompts(args, data, examples)
 
                 messages = get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers)
-                generated_text = get_response(messages, model, tokenizer)
+                generated_text = get_response(args, messages, model, tokenizer)
                 if args.cot:
                     cot_answer = generated_text
                     prompt_extended += cot_answer + "\n" + " 정답: "
                     messages = get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers)
-                    generated_text = get_response(messages, model, tokenizer)
+                    generated_text = get_response(args, messages, model, tokenizer)
 
                 if generated_text.strip() == '':
                     ans = '-1'
                 else:
-                    for char in generated_text:
-                        if char.isnumeric() and char in [str(n) for n in range(cand_num, 0, -1)]:
-                            ans = char
-                            break
-                        else:
-                            ans = '-1'
-                            cannot_generate += 1
+                    if 'deepseek' in args.torch_model_name:
+                        ans_start_idx = generated_text.find("</think>")
+                        if ans_start_idx == -1:
+                            text = tokenizer.apply_chat_template(
+                                messages,
+                                tokenize=False,
+                                add_generation_prompt=True,
+                            )
+                            model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+                            generated_ids = model.generate(
+                                **model_inputs,
+                                max_new_tokens=2000,
+                                temperature=0.6,
+                                pad_token_id=tokenizer.eos_token_id
+                                # do_sample=False
+                            )
+                            generated_ids = [
+                                output_ids[len(input_ids):] for input_ids, output_ids in
+                                zip(model_inputs.input_ids, generated_ids)
+                            ]
+                            generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+                            ans_start_idx = generated_text.find("</think>")
+
+                        ans_part = generated_text[ans_start_idx+len("</think>"):].strip()
+                        print(ans_part)
+                        for char in ans_part:
+                            if char.isnumeric() and char in [str(n) for n in range(cand_num, 0, -1)]:
+                                ans = char
+                                break
+                            else:
+                                ans = '-1'
+                                cannot_generate += 1
+                    else:
+                        print(generated_text)
+                        for char in generated_text:
+                            if char.isnumeric() and char in [str(n) for n in range(cand_num, 0, -1)]:
+                                ans = char
+                                break
+                            else:
+                                ans = '-1'
+                                cannot_generate += 1
 
                 data['prediction'] = ans
                 data['generated_ans'] = generated_text
+                if "deepseek" in args.torch_model_name:
+                    data["answer_part"] = ans_part
                 if args.cot:
                     data['cot_answer'] = cot_answer
 
@@ -519,7 +676,7 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
 
 
 if __name__ == "__main__":
-    access_token = open("utils/hf_token.txt", "r").read().strip()
+    access_token = open("api_tokens/hf_token.txt", "r").read().strip()
     login(token=access_token)
 
     ######################################
@@ -529,7 +686,7 @@ if __name__ == "__main__":
     parser.add_argument('--mode', type=str, default="debug")
     parser.add_argument('--host', type=str, default="localhost")
     parser.add_argument('--port', type=int, default=56789)
-    parser.add_argument('--torch_model_name', type=str, default="LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct",
+    parser.add_argument('--torch_model_name', type=str, default="mistralai/Mistral-Small-24B-Instruct-2501",
                         choices=["upstage/SOLAR-10.7B-Instruct-v1.0",
                                  "yanolja/EEVE-Korean-10.8B-v1.0",
                                  "yanolja/EEVE-Korean-Instruct-10.8B-v1.0",
@@ -538,14 +695,18 @@ if __name__ == "__main__":
                                  "LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct",
                                  "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct",
                                  "LGAI-EXAONE/EXAONE-3.5-32B-Instruct",
+                                 "Qwen/Qwen2.5-7B-Instruct",
+                                 "Qwen/Qwen2.5-14B-Instruct",
                                  "Qwen/Qwen2.5-32B-Instruct",
-                                 # "Qwen/Qwen2.5-72B-Instruct",
                                  "google/gemma-2-9b-it",
                                  "google/gemma-2-27b-it",
                                  "meta-llama/Llama-3.1-8B-Instruct",
                                  # "meta-llama/Llama-3.1-70B-Instruct",
                                  "meta-llama/Llama-3.2-3B-Instruct",
                                  # "meta-llama/Llama-3.3-70B-Instruct",
+                                 "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+                                 "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+                                 "mistralai/Mistral-Small-24B-Instruct-2501"
                                  ])
     parser.add_argument('--repeat_penalty', type=float, default=1.05)
     parser.add_argument('--max_new_tokens', type=int, default=100)

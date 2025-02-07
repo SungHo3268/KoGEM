@@ -2,15 +2,15 @@ import os
 import sys
 import json
 import random
-from g2pk import G2p
 from tqdm import tqdm
+from kiwipiepy import Kiwi
 from openai import OpenAI
 sys.path.append(os.getcwd())
 from srcs.functions import init_random
 
 init_random(42)
-g2p = G2p()
 
+kiwi = Kiwi()
 
 ################################
 #      Call OpenAI Client      #
@@ -39,7 +39,7 @@ model_var = "o1-preview"
 " HSQE  ||  LCSE(G9)  ||  LCSE(G7)  ||  NCSE(G9)  ||  NCSE(G7) "  
 """
 total_dataset = json.load(open(f"datasets/KoGEM_benchmark.json", "r"))
-
+json.dump(total_dataset, open(f"datasets/KoGEM_benchmark.json", "w"), indent=2, ensure_ascii=False)
 batch_size = 100
 batch_num = len(total_dataset) // batch_size + 1
 
@@ -58,7 +58,7 @@ os.makedirs(output_dir, exist_ok=True)
 ################################
 acc = 0
 cannot_generate = 0
-for i in range(batch_num):
+for i in range(6, batch_num):
     dataset = total_dataset[i*batch_size: (i+1)*batch_size]
 
     ##################################
@@ -67,7 +67,8 @@ for i in range(batch_num):
     for n, data in tqdm(enumerate(dataset), total=len(dataset),
                         desc=f"({i+1}/{batch_num}) th Generating answers using '{model_var}' model with 0-shot eval...",
                         bar_format="{l_bar}{bar:15}{r_bar}"):
-        if data["level_1"] != "Phonology":
+        if data["level_1"] != "Morphology":
+        # if data["level_2"] != "Morpheme":
             continue
 
         if data['data_src'] in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)', 'CSAT']:
@@ -81,7 +82,11 @@ for i in range(batch_num):
         context = data['context'].strip()
         paragraph = data['paragraph'].strip()
         candidates = [cand.strip() for cand in data['candidates']]
-        candidates = [cand + f" (발음: {g2p(cand)})" for cand in candidates]
+        # candidates = [cand + f" (형태소: {[tok_set.form for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]                                       # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요', ',', '반갑', '습니다', '.'])"
+        candidates = [cand + f" (형태소: {[tok_set.form + '(' + tok_set.tag + ')'  for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]            # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요(NNP)', ',(SP)', '반갑(VA-I)', '습니다(EF)', '.(SF)'])"
+        # candidates = [cand + f" (형태소: {', '.join([tok_set.form for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]                            # '안녕하세요, 반갑습니다. (형태소: 안녕하세요, ,, 반갑, 습니다, .)'
+        # candidates = [cand + f" (형태소: {'/'.join([tok_set.form for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]                             # '안녕하세요, 반갑습니다. (형태소: 안녕하세요/,/반갑/습니다/.)'
+        # candidates = [cand + f" (형태소: {'/'.join([tok_set.form + '(' + tok_set.tag + ')' for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]   # '안녕하세요, 반갑습니다. (형태소: 안녕하세요(NNP)/,(SP)/반갑(VA-I)/습니다(EF)/.(SF))'
         candidates = "\n ".join(candidates)
 
         # prompt
@@ -171,7 +176,7 @@ for i in range(batch_num):
     #       Save the Predictions      #
     ###################################
     json.dump(dataset,
-              open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_phonology.json"), "w", encoding="utf-8"),
+              open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_morphology.json"), "w", encoding="utf-8"),
               ensure_ascii=False,
               indent=2
               )
@@ -183,25 +188,25 @@ for i in range(batch_num):
 # Aggregate all saved files
 all_dataset = []
 for i in range(batch_num):
-    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_phonology.json"), "r"))
+    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_morphology.json"), "r"))
     all_dataset.extend(dataset)
 
-phonology_dataset = []
+morphology_dataset = []
 for data in all_dataset:
-    if data["level_1"] == "Phonology":
-        phonology_dataset.append(data)
+    if data["level_1"] == "Morphology":
+        morphology_dataset.append(data)
 
 
-print(f"Zero-shot Accuracy: {acc / len(phonology_dataset) * 100:.2f} [%]")
-json.dump(phonology_dataset,
-            open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_phonology.json"), "w", encoding="utf-8"),
+print(f"Zero-shot Accuracy: {acc / len(morphology_dataset) * 100:.2f} [%]")
+json.dump(morphology_dataset,
+            open(os.path.join(output_dir, f"{model_var}_0_shot_predictions_morphology.json"), "w", encoding="utf-8"),
             ensure_ascii=False,
             indent=2
             )
 
 # remove previous files
 for i in range(batch_num):
-    os.remove(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_phonology.json"))
+    os.remove(os.path.join(output_dir, f"{model_var}_0_shot_predictions_{i}th_morphology.json"))
 
 print("All predictions are saved.")
 print("Done.")

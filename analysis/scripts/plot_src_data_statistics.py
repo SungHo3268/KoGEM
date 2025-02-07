@@ -14,65 +14,19 @@ sub_categories = KoGEM_info['sub_categories']
 data_srcs = KoGEM_info['data_srcs']
 color_map = json.load(open("utils/color_map.json", "r"))
 
+
 # Count the number of data for each category
 data_src_major = {src_data: {cat: 0 for cat in major_categories} for src_data in data_srcs}
-data_src_sub = {src_data: {cat: 0 for cat in sub_categories} for src_data in data_srcs}
 for data in dataset:
     src = data["data_src"]
     level_1 = data['level_1']
     level_2 = data['level_2']
 
     data_src_major[src][level_1] += 1
-    data_src_sub[src][level_2] += 1
 
-"""
-############################################
-#   Plot Major Categories per Data Source
-############################################
-x = np.arange(len(major_categories))
-width = 0.1  # the width of the bars
-multiplier = 0
-fig, ax = plt.subplots(layout='constrained', figsize=(30, 10))
-for i, key in enumerate(data_src_major):
-    offset = width * (multiplier + 0.2)  # Add extra spacing between groups
-    cur_large_cat = data_src_major[key]
-    rects = ax.bar(x=x + offset,
-                   height=list(cur_large_cat.values()),
-                   width=width,
-                   color=[color_map[cat] for cat in major_categories],
-                   edgecolor='gray',  # Add border to the bars
-                   alpha=0.7,
-                   label=key)
-    ax.bar_label(rects, padding=3, fontsize=20)
-    multiplier += 1
-ax.set_xticks(x + width * (len(major_categories) // 2 + 1), labels=major_categories, fontsize=20)
-ax.legend(loc='upper right', fontsize=16, ncols=2)
-plt.show()
+# Calculate total statistics for all categories
+data_src_major['Total'] = {cat: sum(data_src_major[src][cat] for src in data_srcs) for cat in major_categories}
 
-
-############################################
-#   Plot SubCategories per Data Source
-############################################
-x = np.arange(len(sub_categories))
-width = 0.1  # the width of the bars
-multiplier = 0
-fig, ax = plt.subplots(layout='constrained', figsize=(50, 10))
-for i, key in enumerate(data_src_sub):
-    offset = width * (multiplier + 0.2)  # Add extra spacing between groups
-    cur_sub_cat = data_src_sub[key]
-    rects = ax.bar(x=x + offset,
-                   height=list(cur_sub_cat.values()),
-                   width=width,
-                   color=[color_map[cat] for cat in sub_categories],
-                   edgecolor='gray',  # Add border to the bars
-                   alpha=0.7,
-                   label=key)
-    ax.bar_label(rects, padding=3, fontsize=20)
-    multiplier += 1
-ax.set_xticks(x + width * (len(sub_categories) // 2 + 1), labels=sub_categories, fontsize=20)
-ax.legend(loc='upper right', fontsize=16, ncols=2)
-plt.show()
-"""
 
 ####################################
 #  For each exam source (Pie Chart)
@@ -80,11 +34,14 @@ plt.show()
 data_src_major_ratio = {
     key: {cat: round(data_src_major[key][cat] / sum(data_src_major[key].values()) * 100, 1) for cat in major_categories}
     for key in data_src_major}
-# data_src_sub_ratio = {key: {cat: round(data_src_sub[key][cat]/sum(data_src_sub[key].values())*100, 1) for cat in sub_categories} for key in data_src_sub}
 
-fig, axes = plt.subplots(3, 3, figsize=(20, 20))  # Create a 3x3 grid for subplots
+fig, axes = plt.subplots(2, 5, figsize=(25, 10))  # Create a 2x5 grid for subplots
 
-for ax, (exam, data) in zip(axes.flatten(), data_src_major_ratio.items()):
+# Define the order of circles for plotting
+circle_order = ["NUAT(HS1)", "NUAT(HS1)", "NUAT(HS1)", "CSAT", "HSQE", "LCSE(G9)", "LCSE(G7)", "NCSE(G9)", "NCSE(G7)", "Total"]
+
+for ax, exam in zip(axes.flatten(), circle_order):
+    data = data_src_major_ratio.get(exam, {})
     sizes = [val for val in data.values() if val > 0]
     labels = [key for key, val in data.items() if val > 0]
     colors = [color_map[label] for label in labels]

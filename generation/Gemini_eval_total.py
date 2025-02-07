@@ -24,7 +24,7 @@ kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
 model_variants: 'gemini-2.0-flash-exp' || 'gemini-1.5-pro' || 'gemini-1.5-flash' || 'gemini-1.0-pro'
 """
 
-access_token = open("utils/gemini_token.txt", "r").read().strip()
+access_token = open("api_tokens/gemini_token.txt", "r").read().strip()
 genai.configure(api_key=access_token)
 
 
