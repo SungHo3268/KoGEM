@@ -12,7 +12,7 @@ categories = kogem_info["major_categories"]
 num_vars = len(categories)
 
 # Data preperation
-data = pd.read_excel("analysis/assets/exp_results/linguistic_category_results.xlsx", sheet_name='Sheet1')
+data = pd.read_excel("analysis/assets/exp_results/main_linguistic_category_results.xlsx", sheet_name='Sheet1')
 
 results = {}
 for i in range(len(data)):

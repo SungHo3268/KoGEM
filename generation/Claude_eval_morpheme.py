@@ -17,14 +17,14 @@ kiwi = Kiwi()
 #      Call Claude Client      #
 ################################
 """
-                          Fastest                       Fast                   Moderately fast                      Fast
-model_variants: 'claude-3-haiku-20240307' || 'claude-3-sonnet-20240229' || 'claude-3-opus-20240229'   ||   'claude-3-5-sonnet-20240620'
+                          Fastest                       Fast                   Moderately fast                      Fastest                            Fast
+model_variants: 'claude-3-haiku-20240307' || 'claude-3-sonnet-20240229' || 'claude-3-opus-20240229'   ||  'claude-3-5-haiku-20241022'  ||  'claude-3-5-sonnet-20240620'
 """
 access_token = open("api_tokens/claude_token.txt", "r").read().strip()
 
 client = anthropic.Anthropic(api_key=access_token)
 
-model_var = "claude-3-5-sonnet-20240620"
+model_var = "claude-3-5-haiku-20241022"
 
 
 ################################
@@ -80,11 +80,7 @@ for i in range(batch_num):
         context = data['context'].strip()
         paragraph = data['paragraph'].strip()
         candidates = [cand.strip() for cand in data['candidates']]
-        # candidates = [cand + f" (형태소: {[tok_set.form for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]                                       # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요', ',', '반갑', '습니다', '.'])"
-        # candidates = [cand + f" (형태소: {[tok_set.form + '(' + tok_set.tag + ')'  for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]            # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요(NNP)', ',(SP)', '반갑(VA-I)', '습니다(EF)', '.(SF)'])"
-        # candidates = [cand + f" (형태소: {', '.join([tok_set.form for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]                            # '안녕하세요, 반갑습니다. (형태소: 안녕하세요, ,, 반갑, 습니다, .)'
-        # candidates = [cand + f" (형태소: {'/'.join([tok_set.form for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]                             # '안녕하세요, 반갑습니다. (형태소: 안녕하세요/,/반갑/습니다/.)'
-        candidates = [cand + f" (형태소: {'/'.join([tok_set.form + '(' + tok_set.tag + ')' for tok_set in kiwi.tokenize(cand)])})" for cand in candidates]   # '안녕하세요, 반갑습니다. (형태소: 안녕하세요(NNP)/,(SP)/반갑(VA-I)/습니다(EF)/.(SF))'
+        candidates = [cand + f" (형태소: {[tok_set.form + '(' + tok_set.tag + ')'  for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]            # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요(NNP)', ',(SP)', '반갑(VA-I)', '습니다(EF)', '.(SF)'])"
         candidates = "\n ".join(candidates)
 
         # prompt

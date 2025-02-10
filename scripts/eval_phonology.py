@@ -3,7 +3,7 @@ import json
 
 
 model_type = "Claude"               # OpenAI  ||  Claude
-model_var = "claude-3-5-sonnet-20240620"            # gpt-4o  ||  o1-preview  ||  claude-3-5-sonnet-20240620
+model_var = "claude-3-haiku-20240307"            # gpt-4o  ||  o1-preview  ||  claude-3-haiku-20240307  ||  claude-3-5-sonnet-20240620  ||  claude-3-5-haiku-20241022
 
 org_data_path = f"logs/{model_type}/{model_var}_0_shot_predictions.json"
 org_outputs = json.load(open(org_data_path, "r"))

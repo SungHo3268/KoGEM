@@ -16,14 +16,14 @@ g2p = G2p()
 #      Call Claude Client      #
 ################################
 """
-                          Fastest                       Fast                   Moderately fast                      Fast
-model_variants: 'claude-3-haiku-20240307' || 'claude-3-sonnet-20240229' || 'claude-3-opus-20240229'   ||   'claude-3-5-sonnet-20240620'
+                          Fastest                       Fast                   Moderately fast                      Fastest                            Fast
+model_variants: 'claude-3-haiku-20240307' || 'claude-3-sonnet-20240229' || 'claude-3-opus-20240229'   ||  'claude-3-5-haiku-20241022'  ||  'claude-3-5-sonnet-20240620'
 """
 access_token = open("api_tokens/claude_token.txt", "r").read().strip()
 
 client = anthropic.Anthropic(api_key=access_token)
 
-model_var = "claude-3-5-sonnet-20240620"
+model_var = "claude-3-haiku-20240307"
 
 
 ################################

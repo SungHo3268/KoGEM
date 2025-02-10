@@ -153,9 +153,10 @@ plt.gca().spines['right'].set_visible(False)
 plt.gca().spines['bottom'].set_color('black')
 plt.gca().spines['left'].set_color('black')
 
+
 # Save the figure
 save_dir = "analysis/assets/figures/"
 os.makedirs(save_dir, exist_ok=True)
-plt.savefig(os.path.join(save_dir, "subcategory_v0.7.pdf"), format='png', dpi=300, bbox_inches='tight', transparent=True)
+plt.savefig(os.path.join(save_dir, "subcategory_v0.8.pdf"), format='png', dpi=300, bbox_inches='tight', transparent=True)
 plt.show()
 plt.close()

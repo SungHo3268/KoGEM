@@ -32,10 +32,11 @@ Qwen2.5-7B-Instruct
 Qwen2.5-14B-Instruct
 Qwen2.5-32B-Instruct
 DeepSeek-R1-Distill-Qwen-14B
+DeepSeek-R1-Distill-Qwen-32B
 Llama-3.1-8B-Instruct
 """
 
-model_type = "OpenAI"
+model_type = "DeepSeek-R1-Distill-Qwen-32B"
 model_var = "gpt-4o-mini"
 eval_method = "0"          # 0, 1, 5, 'each_major_one', 'each_sub_one'
 cot = False

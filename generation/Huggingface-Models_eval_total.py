@@ -107,6 +107,12 @@ def get_tokenizer_and_model(torch_model_name):
                 device_map="auto",
                 pad_token_id=tokenizer.eos_token_id,
             )
+        elif 's1' in args.torch_model_name:
+            model = AutoModelForCausalLM.from_pretrained(
+                torch_model_name,
+                torch_dtype=torch.float16,
+                device_map="auto"
+            )
         elif 'Qwen' in torch_model_name:
             model = AutoModelForCausalLM.from_pretrained(
                 torch_model_name,
@@ -359,11 +365,13 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                 ]
         messages[-1]["content"] += f" 다른 과정 필요 없이, 최종 답변: [integer], 해설: [string] 형태의 한국어로만 답해줘. <think>\n"
 
-    elif 'EXAONE' in args.torch_model_name or 'Qwen' in args.torch_model_name:
+    elif 'EXAONE' in args.torch_model_name or 'Qwen' in args.torch_model_name or 's1' in args.torch_model_name:
         if 'EXAONE' in args.torch_model_name:
             set_role = "You are EXAONE model from LG AI Research, a helpful assistant."
         elif 'Qwen' in args.torch_model_name:
             set_role = "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."
+        elif 's1' in args.torch_model_name:
+            set_role = "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step."
         else:
             raise NotImplementedError
 
@@ -483,6 +491,22 @@ def get_response(args, messages, model, tokenizer):
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
         ]
         generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    elif 's1' in args.torch_model_name:
+        text = tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+        generated_ids = model.generate(
+            **model_inputs,
+            max_new_tokens=1000,
+            temperature=1e-10,
+        )
+        generated_ids = [
+            output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+        ]
+        generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     elif ('Qwen' in args.torch_model_name) or ('gemma' in args.torch_model_name):
         text = tokenizer.apply_chat_template(
             messages,
@@ -532,8 +556,6 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
     with torch.no_grad():
         for i in range(batch_num):
             if args.continue_batch_num and i < args.continue_batch_num:
-                continue
-            if 15 < i < 66:
                 continue
 
             dataset = total_dataset[i * args.batch_size: (i+1) * args.batch_size]
@@ -620,6 +642,35 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                             else:
                                 ans = '-1'
                                 cannot_generate += 1
+                    elif 's1' in args.torch_model_name:
+                        ans_start_idx = generated_text.find("answer")
+                        if ans_start_idx == -1:
+                            text = tokenizer.apply_chat_template(
+                                messages,
+                                tokenize=False,
+                                add_generation_prompt=True,
+                            )
+                            model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
+                            generated_ids = model.generate(
+                                **model_inputs,
+                                max_new_tokens=2000,
+                                temperature=1e-10,
+                            )
+                            generated_ids = [
+                                output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+                            ]
+                            generated_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+                            ans_start_idx = generated_text.find("answer")
+
+                        ans_part = generated_text[ans_start_idx + len("answer"):].strip()
+                        print(f"ans_part: {ans_part}")
+                        for char in ans_part:
+                            if char.isnumeric() and char in [str(n) for n in range(cand_num, 0, -1)]:
+                                ans = char
+                                break
+                            else:
+                                ans = '-1'
+                                cannot_generate += 1
                     else:
                         print(generated_text)
                         for char in generated_text:
@@ -632,7 +683,7 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
 
                 data['prediction'] = ans
                 data['generated_ans'] = generated_text
-                if "deepseek" in args.torch_model_name:
+                if "deepseek" in args.torch_model_name or 's1' in args.torch_model_name:
                     data["answer_part"] = ans_part
                 if args.cot:
                     data['cot_answer'] = cot_answer
@@ -686,7 +737,7 @@ if __name__ == "__main__":
     parser.add_argument('--mode', type=str, default="debug")
     parser.add_argument('--host', type=str, default="localhost")
     parser.add_argument('--port', type=int, default=56789)
-    parser.add_argument('--torch_model_name', type=str, default="mistralai/Mistral-Small-24B-Instruct-2501",
+    parser.add_argument('--torch_model_name', type=str, default="simplescaling/s1-32B",
                         choices=["upstage/SOLAR-10.7B-Instruct-v1.0",
                                  "yanolja/EEVE-Korean-10.8B-v1.0",
                                  "yanolja/EEVE-Korean-Instruct-10.8B-v1.0",
@@ -706,7 +757,8 @@ if __name__ == "__main__":
                                  # "meta-llama/Llama-3.3-70B-Instruct",
                                  "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
                                  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
-                                 "mistralai/Mistral-Small-24B-Instruct-2501"
+                                 "mistralai/Mistral-Small-24B-Instruct-2501",
+                                 "simplescaling/s1-32B"
                                  ])
     parser.add_argument('--repeat_penalty', type=float, default=1.05)
     parser.add_argument('--max_new_tokens', type=int, default=100)
