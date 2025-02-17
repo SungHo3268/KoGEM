@@ -10,7 +10,8 @@
 [kogl-1-shield]: https://www.kogl.or.kr/static/kogl/img/sub/number1.jpg
 
 
-This repository is associated with a paper currently under review for ACL 2025.
+This repository is associated with a paper currently under review for ACL 2025. <br/>
+We plan to upload our benchmark and generation results upon acceptance.
 <br/><br/>
 
 
