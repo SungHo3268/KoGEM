@@ -6,7 +6,7 @@
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 [cc-by]: https://creativecommons.org/licenses/by/4.0/
 
-[hf-data-shield]: https://img.shields.io/badge/🤗.-Dataset%20In%20Huggingface-blue.svg
+[hf-data-shield]: https://img.shields.io/badge/🤗.-Dataset%20Card-blue.svg
 [hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
 
 
