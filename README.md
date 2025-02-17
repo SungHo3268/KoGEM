@@ -1,13 +1,9 @@
 # Polishing Every Facet of the GEM: Testing Linguistic Competence in LLMs and Humans
 
-[![KOGL TYPE 1][kogl-1-shield]][kogl-1]  [![CC BY 4.0][cc-by-shield]][cc-by]
-
+[![CC BY 4.0][cc-by-shield]][cc-by]
 
 [cc-by]: https://creativecommons.org/licenses/by/4.0/
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
-
-[kogl-1]: https://www.kogl.or.kr/info/license.do
-[kogl-1-shield]: https://www.kogl.or.kr/static/kogl/img/sub/number1.jpg
 
 
 This repository is associated with a paper currently under review for ACL 2025. <br/>
@@ -65,9 +61,14 @@ A closer examination of individual subcategories. These results reveal distinct 
 
 </br></br>
 ## License
-
-This work is used according to [Korea Open Government License (KOGL) Type 1](https://www.kogl.or.kr/info/license.do).
-
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+
+This work is used according to [Korea Open Government License (KOGL) Type 1](https://www.kogl.or.kr/info/license.do). <br/>
+
+[![KOGL TYPE 1][kogl-1-shield]][kogl-1]
+
+[kogl-1]: https://www.kogl.or.kr/info/license.do
+[kogl-1-shield]: https://www.kogl.or.kr/static/kogl/img/sub/number1.jpg
+
 
 
