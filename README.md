@@ -118,7 +118,7 @@ You can assess all LLMs reported in our paper using below comands.<br/>
 A closer examination of individual subcategories. These results reveal distinct strengths and weaknesses, as LLMs and humans excel in different areas, underscoring the need for a fine-grained evaluation of linguistic competence at the subcategory level.
 
 </br>
-<img src='analysis/assets/figures/subcategory_results.png' width='80%'>
+<img src='analysis/assets/figures/subcategory_results.png' width='90%'>
 
 </br></br>
 
