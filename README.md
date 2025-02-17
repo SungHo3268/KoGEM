@@ -11,11 +11,15 @@
 
 
 This repository is associated with a paper currently under review for ACL 2025. <br/>
-We plan to upload our benchmark and generation results upon acceptance.
 <br/><br/>
 
 
 ## KoGEM (<ins>Ko</ins>rean <ins>G</ins>rammar <ins>E</ins>valuation Bench<ins>M</ins>ark)
+
+~~You can download the dataset from [here]().~~
+<br/>
+Notice) We plan to upload our benchmark and generation results upon acceptance.
+<br/><br/>
 
 This presents the components and statistics of our proposed dataset, KoGEM. Our benchmark consists of a total of 1,524 annotated QA pairs. More detailed information about KoGEM can be found in our paper.
 
