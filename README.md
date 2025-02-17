@@ -14,21 +14,29 @@ This repository is associated with a paper currently under review for ACL 2025. 
 <br/><br/>
 
 
-## Settings
+## Environment Settings
 1. Create the virtual environment.
-```
-conda create -n env_name python=3.9.12
-```
+    ```
+    conda create -n env_name python=3.9.12
+    ```
 
 2. Activate the virtual environment.
-```
-conda activate env_name
-```
+    ```
+    conda activate env_name
+    ```
 
 3. Install the packages from <code>requirements.txt</code>
-```
-pip install -r requirements.txt
-```
+    ```
+    pip install -r requirements.txt
+    ```
+
+4. Install the torch toolkit</br>
+  Before downloading this Torch package, you should check the compatibility of your CUDA settings.<br/>
+  ( I used CUDA 12.2 and cuDNN 8.9.6 with NVIDIA driver 535.183.01 )
+    ```
+    pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+    ```
+
 
 <br/><br/>
 
