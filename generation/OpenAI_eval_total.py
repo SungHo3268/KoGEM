@@ -2,12 +2,33 @@ import os
 import sys
 import json
 import random
+import argparse
 from tqdm import tqdm
 from openai import OpenAI
 sys.path.append(os.getcwd())
 from srcs.functions import init_random
 
 init_random(42)
+
+
+#####################################
+#           Default Settings         #
+######################################
+parser = argparse.ArgumentParser()
+parser.add_argument('--mode', type=str, default="debug")
+parser.add_argument('--host', type=str, default="localhost")
+parser.add_argument('--port', type=int, default=56789)
+parser.add_argument('--model_var', type=str, required=True,
+                    choices=["gpt-3.5-turbo-0125",
+                             "gpt-4o",
+                             "gpt-4-mini",
+                             "o1-preview",
+                             "o1-mini"
+                             ])
+parser.add_argument('--access_token_path', type=str, required=True)
+parser.add_argument('--batch_size', type=int, default=100)
+parser.add_argument('--max_tokens', type=int, default=200)
+args = parser.parse_args()
 
 
 ################################
@@ -18,17 +39,10 @@ kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
 ################################
 #      Call OpenAI Client      #
 ################################
-"""
-model_variants: 'gpt-3.5-turbo-0125' || 'gpt-4o' || 'gpt-4-mini  ||  o1-preview  ||  o1-mini'
-"""
-access_token = open("api_tokens/openai_token.txt", "r").read().strip()
+access_token = open(args.access_token_path, "r").read().strip()
 client = OpenAI(api_key=access_token)
 
-# model_var = "gpt-3.5-turbo-0125"
-# model_var = "gpt-4o"
-model_var = "gpt-4o-mini"
-# model_var = "o1-preview"
-# model_var = "o1-mini"
+model_var = args.model_var
 
 
 ################################
@@ -43,7 +57,7 @@ model_var = "gpt-4o-mini"
 """
 total_dataset = json.load(open(f"datasets/KoGEM_benchmark.json", "r"))
 
-batch_size = 100
+batch_size = args.batch_size
 batch_num = len(total_dataset) // batch_size + 1
 
 
@@ -51,13 +65,8 @@ batch_num = len(total_dataset) // batch_size + 1
 #     Experimental settings    #
 ################################
 shot_num = '0'        # 0, 1, 5, 'each_major_one', 'each_sub_one'
-cot = False
-cot_prompt = "단계별로 생각해 보자."
-cot_file_index = "_cot" if cot else ""
 
-
-max_tokens = 200
-
+max_tokens = args.max_tokens
 
 output_dir = f"logs/OpenAI/"
 os.makedirs(output_dir, exist_ok=True)
@@ -106,7 +115,7 @@ for i in range(batch_num):
     #        Prompt Evaluation       #
     ##################################
     for n, data in tqdm(enumerate(dataset), total=len(dataset),
-                        desc=f"({i+1}/{batch_num}) th Generating answers using '{model_var}' model with {shot_num}-shot{cot_file_index} eval...",
+                        desc=f"({i+1}/{batch_num}) th Generating answers using '{model_var}' model with {shot_num}-shot eval...",
                         bar_format="{l_bar}{bar:15}{r_bar}"):
         if data['data_src'] in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)', 'CSAT']:
             cand_num = 5
@@ -189,9 +198,6 @@ for i in range(batch_num):
             else:
                 prompt = f"지문: {context} 설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
 
-        if cot:
-            prompt_extended = prompt[: -len(" 정답: ")] + cot_prompt + "\n"
-
 
         label = str(data['label'])
 
@@ -203,7 +209,6 @@ for i in range(batch_num):
         temperature = 0.
         generated_text = ''
         random_select = False
-        cot_answer = ''
         while prediction == '' and num_repeat < 5:
             if shot_num != str(0):
                 messages = [
@@ -230,28 +235,16 @@ for i in range(batch_num):
                     }
                 ])
             else:       # zero-shot
-                if cot:
-                    messages = [
-                        {
-                            "role": "system",
-                            "content": pre_prompt,
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt_extended,
-                        }
-                    ]
-                else:
-                    messages = [
-                        {
-                            "role": "system",
-                            "content": pre_prompt,
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt,
-                        }
-                    ]
+                messages = [
+                    {
+                        "role": "system",
+                        "content": pre_prompt,
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ]
 
             if "o1" in model_var:
                 for m, message in enumerate(messages):
@@ -271,38 +264,6 @@ for i in range(batch_num):
                     temperature=temperature,
                     max_tokens=max_tokens,
                 )
-
-            if cot:
-                cot_answer = response.choices[0].message.content
-                prompt_extended += cot_answer + "\n" + " 정답: "
-                messages = [
-                    {
-                        "role": "system",
-                        "content": pre_prompt,
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt_extended,
-                    }
-                ]
-
-                if "o1" in model_var:
-                    for m, message in enumerate(messages):
-                        if message["role"] == "system":
-                            messages[m]["role"] = "user"
-                    response = client.chat.completions.create(
-                        messages=messages,
-                        model=model_var,
-                        seed=123,
-                    )
-                else:
-                    response = client.chat.completions.create(
-                        messages=messages,
-                        model=model_var,
-                        seed=123,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                    )
 
             generated_text = response.choices[0].message.content
             for char in generated_text:
@@ -325,8 +286,6 @@ for i in range(batch_num):
         data['prediction'] = prediction
         data['generated_ans'] = generated_text
         data['random_sel'] = int(random_select)
-        if cot:
-            data['cot_answer'] = cot_answer
 
         if prediction == label:
             acc += 1
@@ -336,7 +295,7 @@ for i in range(batch_num):
     #       Save the Predictions      #
     ###################################
     json.dump(dataset,
-              open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot{cot_file_index}_predictions_{i}th.json"), "w", encoding="utf-8"),
+              open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions_{i}th.json"), "w", encoding="utf-8"),
               ensure_ascii=False,
               indent=2
               )
@@ -348,14 +307,14 @@ for i in range(batch_num):
 # Aggregate all saved files
 all_dataset = []
 for i in range(batch_num):
-    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot{cot_file_index}_predictions_{i}th.json"), "r"))
+    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions_{i}th.json"), "r"))
     all_dataset.extend(dataset)
 
 
 print(f"Zero-shot Accuracy: {acc / len(all_dataset) * 100:.2f} [%]")
 print(f"Cannot generate: {cannot_generate}/ {len(all_dataset)} ({cannot_generate / len(all_dataset) * 100:.2f} [%])")
 json.dump(all_dataset,
-            open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot{cot_file_index}_predictions.json"), "w", encoding="utf-8"),
+            open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions.json"), "w", encoding="utf-8"),
             ensure_ascii=False,
             indent=2
             )
@@ -363,7 +322,7 @@ json.dump(all_dataset,
 
 # remove previous files
 for i in range(batch_num):
-    os.remove(os.path.join(output_dir, f"{model_var}_{shot_num}_shot{cot_file_index}_predictions_{i}th.json"))
+    os.remove(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions_{i}th.json"))
 
 print("All predictions are saved.")
 print("Done.")

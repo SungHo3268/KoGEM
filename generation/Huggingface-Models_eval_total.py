@@ -7,7 +7,6 @@ import json
 import torch
 import random
 import argparse
-from distutils.util import strtobool as _bool
 from time import time
 from tqdm import tqdm
 from huggingface_hub import login
@@ -119,7 +118,7 @@ def get_tokenizer_and_model(torch_model_name):
                 torch_dtype="auto",
                 device_map="auto",
             )
-        elif 'gemma' in torch_model_name or 'mistral' in torch_model_name:
+        elif 'gemma' in torch_model_name:
             model = AutoModelForCausalLM.from_pretrained(
                 torch_model_name,
                 torch_dtype=torch.bfloat16,
@@ -229,16 +228,12 @@ def make_prompts(args, data, examples):
         else:
             prompt = f"지문: {context} 설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
 
-    if args.cot:
-        prompt_extended = prompt[: -len(" 정답: ")] + args.cot_prompt + "\n"
-    else:
-        prompt_extended = None
 
     label = str(data['label'])
-    return cand_num, pre_prompt, prompt, prompt_extended, label, example_prompts, example_answers
+    return cand_num, pre_prompt, prompt, label, example_prompts, example_answers
 
 
-def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers):
+def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
     if (('llama-3' in args.torch_model_name.lower()) or
             ('KORani-v3' in args.torch_model_name) or
             ('KULLM3' in args.torch_model_name)):
@@ -259,20 +254,12 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                  "content": prompt},
             ])
         else:
-            if args.cot:
-                messages = [
-                    {"role": "system",
-                     "content": f"{pre_prompt}"},
-                    {"role": "user",
-                     "content": f"{prompt_extended}"},
-                ]
-            else:
-                messages = [
-                    {"role": "system",
-                     "content": f"{pre_prompt}"},
-                    {"role": "user",
-                     "content": f"{prompt}"},
-                ]
+            messages = [
+                {"role": "system",
+                 "content": f"{pre_prompt}"},
+                {"role": "user",
+                 "content": f"{prompt}"},
+            ]
     elif 'gemma' in args.torch_model_name:
         if args.shot_num != 0:
             messages = [
@@ -291,49 +278,10 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                  "content": prompt},
             ])
         else:
-            if args.cot:
-                messages = [
-                    {"role": "user",
-                     "content": f"{pre_prompt + prompt_extended}"
-                     },
-                ]
-            else:
-                messages = [
-                    {"role": "user",
-                     "content": f"{pre_prompt + prompt}"},
-                ]
-    elif 'mistral' in args.torch_model_name:
-        if args.shot_num != 0:
             messages = [
-                {"role": "system",
-                 "content": f"{pre_prompt}"}
-            ]
-            for ex_prompt, ex_ans in zip(example_prompts, example_answers):
-                messages.extend([
-                    {"role": "user",
-                     "content": ex_prompt},
-                    {"role": "assistant",
-                     "content": ex_ans}
-                ])
-            messages.extend([
                 {"role": "user",
-                 "content": prompt},
-            ])
-        else:
-            if args.cot:
-                messages = [
-                    {"role": "system",
-                     "content": f"{pre_prompt}"},
-                    {"role": "user",
-                     "content": f"{prompt_extended}"},
-                ]
-            else:
-                messages = [
-                    {"role": "system",
-                     "content": f"{pre_prompt}"},
-                    {"role": "user",
-                     "content": f"{prompt}"},
-                ]
+                 "content": f"{pre_prompt + prompt}"},
+            ]
     elif 'deepseek' in args.torch_model_name:       # It must be located in advance of Qwen.
         if args.shot_num != 0:
             messages = [
@@ -352,17 +300,10 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                  "content": prompt},
             ])
         else:
-            if args.cot:
-                messages = [
-                    {"role": "user",
-                     "content": f"{pre_prompt + prompt_extended}"
-                     },
-                ]
-            else:
-                messages = [
-                    {"role": "user",
-                     "content": f"{pre_prompt + prompt}"},
-                ]
+            messages = [
+                {"role": "user",
+                 "content": f"{pre_prompt + prompt}"},
+            ]
         messages[-1]["content"] += f" 다른 과정 필요 없이, 최종 답변: [integer], 해설: [string] 형태의 한국어로만 답해줘. <think>\n"
 
     elif 'EXAONE' in args.torch_model_name or 'Qwen' in args.torch_model_name or 's1' in args.torch_model_name:
@@ -392,20 +333,12 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                  "content": prompt},
             ])
         else:
-            if args.cot:
-                messages = [
-                    {"role": "system",
-                     "content": f"{set_role + ' ' + pre_prompt}"},
-                    {"role": "user",
-                     "content": f"{prompt_extended}"},
-                ]
-            else:
-                messages = [
-                    {"role": "system",
-                     "content": f"{set_role + ' ' + pre_prompt}"},
-                    {"role": "user",
-                     "content": f"{prompt}"},
-                ]
+            messages = [
+                {"role": "system",
+                 "content": f"{set_role + ' ' + pre_prompt}"},
+                {"role": "user",
+                 "content": f"{prompt}"},
+            ]
     else:
         if args.shot_num != 0:
             messages = pre_prompt + '\n'
@@ -413,10 +346,7 @@ def get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, exa
                 messages += ex_prompt + '\n' + ex_ans + '\n'
             messages += prompt
         else:
-            if args.cot:
-                messages = pre_prompt + '\n' + prompt_extended
-            else:
-                messages = pre_prompt + '\n' + prompt
+            messages = pre_prompt + '\n' + prompt
     return messages
 
 
@@ -550,7 +480,6 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
     st_time = time()
 
     batch_num = len(total_dataset) // args.batch_size + 1
-    cot_file_index = "_cot" if args.cot else ""
 
     cannot_generate = 0
     with torch.no_grad():
@@ -595,20 +524,15 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
             #        Prompt Evaluation       #
             ##################################
             for n, data in tqdm(enumerate(dataset), total=len(dataset),
-                                desc=f"({i + 1}/{batch_num}) th Generating answers using '{args.torch_model_name}' model with {args.shot_num}-shot{cot_file_index} eval...",
+                                desc=f"({i + 1}/{batch_num}) th Generating answers using '{args.torch_model_name}' model with {args.shot_num}-shot eval...",
                                 bar_format="{l_bar}{bar:15}{r_bar}"):
 
                 if ('deepseek' in args.torch_model_name) or ('s1' in args.torch_model_name):
-                    cot_inf_time = time()
-                cand_num, pre_prompt, prompt, prompt_extended, label, example_prompts, example_answers = make_prompts(args, data, examples)
+                    thinking_time = time()
+                cand_num, pre_prompt, prompt, label, example_prompts, example_answers = make_prompts(args, data, examples)
 
-                messages = get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers)
+                messages = get_messages(args, pre_prompt, prompt, example_prompts, example_answers)
                 generated_text = get_response(args, messages, model, tokenizer)
-                if args.cot:
-                    cot_answer = generated_text
-                    prompt_extended += cot_answer + "\n" + " 정답: "
-                    messages = get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers)
-                    generated_text = get_response(args, messages, model, tokenizer)
 
                 if generated_text.strip() == '':
                     ans = '-1'
@@ -688,16 +612,14 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                 data['generated_ans'] = generated_text
                 if "deepseek" in args.torch_model_name or 's1' in args.torch_model_name:
                     data["answer_part"] = ans_part
-                    end_inf_time = time() - cot_inf_time
+                    end_inf_time = time() - thinking_time
                     data["elapsed_time"] = f"{int(end_inf_time//60)}m {int(end_inf_time%60)}s"
-                if args.cot:
-                    data['cot_answer'] = cot_answer
 
             ###################################
             #       Save the Predictions      #
             ###################################
             json.dump(dataset,
-                      open(os.path.join(args.output_dir, f"{args.shot_num}_shot{cot_file_index}_predictions_{i}th.json"), "w", encoding="utf-8"),
+                      open(os.path.join(args.output_dir, f"{args.shot_num}_shot_predictions_{i}th.json"), "w", encoding="utf-8"),
                       ensure_ascii=False,
                       indent=2
                       )
@@ -707,7 +629,7 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
     # Aggregate all saved files
     all_dataset = []
     for i in range(batch_num):
-        dataset = json.load(open(os.path.join(args.output_dir, f"{args.shot_num}_shot{cot_file_index}_predictions_{i}th.json"), "r"))
+        dataset = json.load(open(os.path.join(args.output_dir, f"{args.shot_num}_shot_predictions_{i}th.json"), "r"))
         all_dataset.extend(dataset)
 
     cor_cnt = 0
@@ -719,13 +641,13 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
     print(f"Cannot generate: {cannot_generate}/ {len(all_dataset)}")
     print(f"Elapsed time: {elapsed_time:.2f} [s]")
     json.dump(all_dataset,
-              open(os.path.join(args.output_dir, f"{args.shot_num}_shot{cot_file_index}_predictions.json"), "w", encoding="utf-8"),
+              open(os.path.join(args.output_dir, f"{args.shot_num}_shot_predictions.json"), "w", encoding="utf-8"),
               ensure_ascii=False,
               indent=2
               )
     # remove previous files
     for i in range(batch_num):
-        os.remove(os.path.join(args.output_dir, f"{args.shot_num}_shot{cot_file_index}_predictions_{i}th.json"))
+        os.remove(os.path.join(args.output_dir, f"{args.shot_num}_shot_predictions_{i}th.json"))
 
     print("All predictions are saved.")
     print("Done.")
@@ -742,28 +664,22 @@ if __name__ == "__main__":
     parser.add_argument('--mode', type=str, default="debug")
     parser.add_argument('--host', type=str, default="localhost")
     parser.add_argument('--port', type=int, default=56789)
-    parser.add_argument('--torch_model_name', type=str, default="simplescaling/s1-32B",
+    parser.add_argument('--torch_model_name', type=str, required=True,
                         choices=["upstage/SOLAR-10.7B-Instruct-v1.0",
-                                 "yanolja/EEVE-Korean-10.8B-v1.0",
                                  "yanolja/EEVE-Korean-Instruct-10.8B-v1.0",
                                  "MLP-KTLim/llama-3-Korean-Bllossom-8B",
                                  "nlpai-lab/KULLM3",
-                                 "LGAI-EXAONE/EXAONE-3.0-7.8B-Instruct",
                                  "LGAI-EXAONE/EXAONE-3.5-7.8B-Instruct",
                                  "LGAI-EXAONE/EXAONE-3.5-32B-Instruct",
+                                 "google/gemma-2-9b-it",
+                                 "google/gemma-2-27b-it",
                                  "Qwen/Qwen2.5-7B-Instruct",
                                  "Qwen/Qwen2.5-14B-Instruct",
                                  "Qwen/Qwen2.5-32B-Instruct",
-                                 "google/gemma-2-9b-it",
-                                 "google/gemma-2-27b-it",
-                                 "meta-llama/Llama-3.1-8B-Instruct",
-                                 # "meta-llama/Llama-3.1-70B-Instruct",
-                                 "meta-llama/Llama-3.2-3B-Instruct",
-                                 # "meta-llama/Llama-3.3-70B-Instruct",
                                  "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
                                  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
-                                 "mistralai/Mistral-Small-24B-Instruct-2501",
-                                 "simplescaling/s1-32B"
+                                 "simplescaling/s1-32B",
+                                 "meta-llama/Llama-3.1-8B-Instruct",
                                  ])
     parser.add_argument('--repeat_penalty', type=float, default=1.05)
     parser.add_argument('--max_new_tokens', type=int, default=100)
@@ -771,7 +687,6 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=123)
     parser.add_argument('--batch_size', type=int, default=100)
     parser.add_argument('--shot_num', type=Union[str, int], default=0, help="0  ||  1  ||  5  ||  each_major_one  ||  each_sub_one")
-    parser.add_argument('--cot', type=_bool, default=False)
     parser.add_argument('--continue_batch_num', type=int, default=0)
     args = parser.parse_args()
 
