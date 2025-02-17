@@ -597,6 +597,9 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
             for n, data in tqdm(enumerate(dataset), total=len(dataset),
                                 desc=f"({i + 1}/{batch_num}) th Generating answers using '{args.torch_model_name}' model with {args.shot_num}-shot{cot_file_index} eval...",
                                 bar_format="{l_bar}{bar:15}{r_bar}"):
+
+                if ('deepseek' in args.torch_model_name) or ('s1' in args.torch_model_name):
+                    cot_inf_time = time()
                 cand_num, pre_prompt, prompt, prompt_extended, label, example_prompts, example_answers = make_prompts(args, data, examples)
 
                 messages = get_messages(args, pre_prompt, prompt, prompt_extended, example_prompts, example_answers)
@@ -685,6 +688,8 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                 data['generated_ans'] = generated_text
                 if "deepseek" in args.torch_model_name or 's1' in args.torch_model_name:
                     data["answer_part"] = ans_part
+                    end_inf_time = time() - cot_inf_time
+                    data["elapsed_time"] = f"{int(end_inf_time//60)}m {int(end_inf_time%60)}s"
                 if args.cot:
                     data['cot_answer'] = cot_answer
 
