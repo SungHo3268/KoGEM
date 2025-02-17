@@ -1,9 +1,15 @@
 # Polishing Every Facet of the GEM: Testing Linguistic Competence in LLMs and Humans
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
+[![Dataset on HF][hf-data-shield]][hf-data]
 
-[cc-by]: https://creativecommons.org/licenses/by/4.0/
+
+
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
+[cc-by]: https://creativecommons.org/licenses/by/4.0/
+
+[hf-data-shield]: https://img.shields.io/badge/🤗.-Dataset%20In%20Huggingface-blue.svg
+[hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
 
 
 This repository is associated with a paper currently under review for ACL 2025. <br/>
