@@ -14,6 +14,26 @@ This repository is associated with a paper currently under review for ACL 2025. 
 <br/><br/>
 
 
+## Settings
+1. Create the virtual environment.
+```
+conda create -n env_name python=3.9.12
+```
+
+2. Activate the virtual environment.
+```
+conda activate env_name
+```
+
+3. Install the packages from <code>requirements.txt</code>
+```
+pip install -r requirements.txt
+```
+
+<br/><br/>
+
+
+
 ## KoGEM (<ins>Ko</ins>rean <ins>G</ins>rammar <ins>E</ins>valuation Bench<ins>M</ins>ark)
 
 ~~You can download the dataset from [here]().~~
