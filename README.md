@@ -33,9 +33,7 @@ This repository is associated with a paper currently under review for ACL 2025. 
     pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
     ```
 
-
 <br/><br/>
-
 
 
 ## KoGEM (<ins>Ko</ins>rean <ins>G</ins>rammar <ins>E</ins>valuation Bench<ins>M</ins>ark)
@@ -52,14 +50,79 @@ This presents the components and statistics of our proposed dataset, KoGEM. Our 
 
 
 </br></br>
+
+
+## Zero-shot Evaluation of LLMs on KoGEM
+
+You can assess all LLMs reported in our paper using below comands.<br/>
+
+
+* Open-source LLMs
+  <br/><br/>
+  : If you want to resume the evaluation from a specific batch number, set the 'continue_batch_num' parameter.
+  <br/><br/>
+  ```
+  python generations/Huggingface-Models_eval_total.py --torch_model_name simplescaling/s1-32B --batch_size 100
+  ```
+<br/>
+  
+    
+* Closed-source LLMs
+    <br/><br/>
+    <b><ins>Notice</ins>: If you want to evaluate closed-source LLMs such as OpenAI's GPT, Claude, Gemini, or the LLaMA series, you must provide your own API access key (token) by placing it in the <code>api_tokens</code> folder as an individual file.</b>
+    <br/>
+    
+    For example,
+    ```
+    KoGEM
+     ㄴ analysis
+     ㄴ ...
+     ㄴ api_tokens
+         ㄴ claude_token.txt
+           : sk-aat-api00--VpfeffFJIEJOFJfEesf_d4MpMZkESjoxukLfs5_a_51csEXm9hAYwAA
+         ㄴ openai_token.txt
+         ㄴ ...
+     ㄴ ...
+    ```
+    <br/>
+    
+    
+    * OpenAI GPT series
+        ```
+        python generations/OpenAI_eval_total.py --model_var gpt-4o --access_token_path api_tokens/openai_token.txt
+        ```
+    
+    * Claude series
+        ```
+        python generations/Claude_eval_total.py --model_var claude-3-5-sonnet-20240620 --access_token_path api_tokens/claude_token.txt
+        ```
+        
+    * Gemini series
+        ```
+        python generations/Gemini_eval_total.py --model_var gemini-2.0-flash-exp --access_token_path api_tokens/gemini_token.txt
+        ```
+    
+    * LLaMA series
+        ```
+        python generations/Llama_eval_total.py --model_var llama3-70b --access_token_path api_tokens/llama_token.txt
+        ```
+        
+    * HyperCLOVA X series
+        ```
+        python generations/ClovaX_eval_total.py --model_var HCX-DASH-001 --access_token_path api_tokens/clovax_chat_api_key.txt
+        ```
+<br/><br/>
+
+
 ## Zero-shot Evaluation Results for Each Subcategory
 A closer examination of individual subcategories. These results reveal distinct strengths and weaknesses, as LLMs and humans excel in different areas, underscoring the need for a fine-grained evaluation of linguistic competence at the subcategory level.
 
 </br>
 <img src='analysis/assets/figures/subcategory_results.png' width='80%'>
 
-
 </br></br>
+
+
 ## License
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
 
