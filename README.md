@@ -10,7 +10,7 @@
 [hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
 
 
-This repository is associated with a paper currently under review for ACL 2025. <br/>
+This repository is associated with a paper currently under review. <br/>
 <br/><br/>
 
 
