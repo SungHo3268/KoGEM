@@ -7,7 +7,7 @@
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 [cc-by]: https://creativecommons.org/licenses/by/4.0/
 
-[kogl-1-shield]: https://img.shields.io/badge/License-KOGLE%20Type1%20-lightgreen.svg
+[kogl-1-shield]: https://img.shields.io/badge/License-KOGL%20Type1%20-lightgreen.svg
 [kogl-1]: https://www.kogl.or.kr/info/license.do
 
 [hf-data-shield]: https://img.shields.io/badge/🤗.-Dataset%20Card-blue.svg
