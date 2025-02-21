@@ -77,14 +77,14 @@ for i in range(batch_num):
             raise NotImplementedError
 
         question = data['question'].strip()
-        context = data['context'].strip()
+        passage = data['passage'].strip()
         paragraph = data['paragraph'].strip()
         candidates = [cand.strip() for cand in data['candidates']]
         candidates = [cand + f" (형태소: {[tok_set.form + '(' + tok_set.tag + ')'  for tok_set in kiwi.tokenize(cand)]})" for cand in candidates]            # "안녕하세요, 반갑습니다. (형태소: ['안녕하세요(NNP)', ',(SP)', '반갑(VA-I)', '습니다(EF)', '.(SF)'])"
         candidates = "\n ".join(candidates)
 
         # prompt
-        if context == '':
+        if passage == '':
             if paragraph == '':
                 pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 질문에 대한 정답으로 올바른 번호를 선택지에서 고르고, 그에 맞는 해설을 100자 내로 설명하시오."
                 prompt = f"질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
@@ -94,10 +94,10 @@ for i in range(batch_num):
         else:
             if paragraph == '':
                 pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 지문을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르고, 그에 맞는 해설을 100자 내로 설명하시오."
-                prompt = f"지문: {context} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
+                prompt = f"지문: {passage} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
             else:
                 pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 지문과 설명을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르고, 그에 맞는 해설을 100자 내로 설명하시오."
-                prompt = f"지문: {context} 설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
+                prompt = f"지문: {passage} 설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
 
 
         label = str(data['label'])

@@ -168,13 +168,13 @@ for i in range(batch_num):
             raise NotImplementedError
 
         question = data['question'].strip()
-        context = data['context'].strip()
+        passage = data['passage'].strip()
         paragraph = data['paragraph'].strip()
         candidates = [cand.strip() for cand in data['candidates']]
         candidates = "\n ".join(candidates)
 
         # pre_prompt
-        if context.strip != '':
+        if passage.strip != '':
             if paragraph.strip != '':
                 pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 지문과 설명을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르고, 그에 맞는 해설을 100자 내로 설명하시오."
             else:
@@ -187,7 +187,7 @@ for i in range(batch_num):
 
         if shot_num != str(0):
             # pre_prompt
-            if context.strip != '':
+            if passage.strip != '':
                 if paragraph.strip != '':
                     pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 지문과 설명을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르시오."
                 else:
@@ -202,7 +202,7 @@ for i in range(batch_num):
             example_answers = []
             for ex in examples:
                 q = ex['question'].strip()
-                c = ex['context'].strip()
+                c = ex['passage'].strip()
                 p = ex['paragraph'].strip()
                 cands = [cand.strip() for cand in ex['candidates']]
                 cands = "\n ".join(cands)
@@ -215,31 +215,31 @@ for i in range(batch_num):
                 else:
                     raise NotImplementedError
 
-                if context == '':
+                if passage == '':
                     if paragraph == '':
                         ex_prompt = f"질문: 다음 선택지 1 부터 {ex_cand_num} 중 {q}\n 선택지: {cands}\n 정답: "
                     else:
                         ex_prompt = f"설명: {p} 질문: 다음 선택지 1 부터 {ex_cand_num} 중 {q}\n 선택지: {cands}\n 정답: "
                 else:
                     if paragraph == '':
-                        ex_prompt = f"지문: {context} 질문: 다음 선택지 1 부터 {ex_cand_num} 중 {q}\n 선택지: {cands}\n 정답: "
+                        ex_prompt = f"지문: {passage} 질문: 다음 선택지 1 부터 {ex_cand_num} 중 {q}\n 선택지: {cands}\n 정답: "
                     else:
-                        ex_prompt = f"지문: {context} 설명: {p} 질문: 다음 선택지 1 부터 {ex_cand_num} 중 {q}\n 선택지: {cands}\n 정답: "
+                        ex_prompt = f"지문: {passage} 설명: {p} 질문: 다음 선택지 1 부터 {ex_cand_num} 중 {q}\n 선택지: {cands}\n 정답: "
 
                 example_prompts.append(ex_prompt)
                 example_answers.append(str(ans))
 
         # prompt
-        if context == '':
+        if passage == '':
             if paragraph == '':
                 prompt = f"질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
             else:
                 prompt = f"설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
         else:
             if paragraph == '':
-                prompt = f"지문: {context} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
+                prompt = f"지문: {passage} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
             else:
-                prompt = f"지문: {context} 설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
+                prompt = f"지문: {passage} 설명: {paragraph} 질문: 다음 선택지 1 부터 {cand_num} 중 {question}\n 선택지: {candidates}\n 정답: "
 
         label = str(data['label'])
 

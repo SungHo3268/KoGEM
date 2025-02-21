@@ -9,4 +9,3 @@ api_tokens/
 logs/
 *.pdf
 extract_que_*
-eval_human*

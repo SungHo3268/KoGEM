@@ -61,11 +61,11 @@ for file_name in tqdm(file_list, desc="Checking file_name format...", bar_format
         raise NotImplementedError
 
 total_data = []
-preprocess_context = False
+preprocess_passage = False
 preprocess_question = False
-image_context = False
+image_passage = False
 image_question = False
-cur_data_set = {'num_id': '', 'context': '', 'question': '', 'paragraph': '', 'candidates': []}
+cur_data_set = {'num_id': '', 'passage': '', 'question': '', 'paragraph': '', 'candidates': []}
 for file_name in tqdm(file_list, desc="Extracting data from scrapped images", bar_format="{l_bar}{bar:15}{r_bar}"):
     f_name, file_ext = file_name.split(".")
     year = f_name.split("_")[0]
@@ -97,7 +97,7 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
     elif last_index == 'P':
         last_index = f_name.split("_")[-2]
         if last_index == '지문':
-            preprocess_context = True
+            preprocess_passage = True
         elif last_index == '문제':
             preprocess_question = True
         else:
@@ -105,7 +105,7 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
     elif last_index == 'I':
         last_index = f_name.split("_")[-2]
         if last_index == '지문':
-            image_context = True
+            image_passage = True
         elif last_index == '문제':
             image_question = True
         else:
@@ -156,7 +156,7 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
         if last_index == "문제":
             if cur_data_set['num_id'] != '':
                 total_data.append(cur_data_set)
-                cur_data_set = {'num_id': '', 'context': '', 'question': '', 'paragraph': '', 'candidates': []}
+                cur_data_set = {'num_id': '', 'passage': '', 'question': '', 'paragraph': '', 'candidates': []}
 
             q_end = text.find("?")+1
             question = text[: q_end].strip()
@@ -208,7 +208,7 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
                     candidates.append(cand)
                     text = text[cand_end:]
 
-            if image_context or image_question or preprocess_context or preprocess_question or etc:
+            if image_passage or image_question or preprocess_passage or preprocess_question or etc:
                 num = f_name.split("_")[-3]
             else:
                 num = f_name.split("_")[-2]
@@ -234,12 +234,12 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
             if preprocess_question:
                 cur_data_set['num_id'] += '-PQ'
                 preprocess_question = False
-            if image_context:
+            if image_passage:
                 cur_data_set['num_id'] += '-IC'
-                image_context = False
-            if preprocess_context:
+                image_passage = False
+            if preprocess_passage:
                 cur_data_set['num_id'] += '-PC'
-                preprocess_context = False
+                preprocess_passage = False
 
             if etc:
                 cur_data_set['num_id'] += '-ETC'
@@ -249,14 +249,14 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
             cur_data_set['candidates'] = candidates
 
         elif last_index == "지문":
-            cur_data_set['context'] = text
+            cur_data_set['passage'] = text
             if cur_data_set['num_id'] != '':        # If '지문'이 '문제보다 먼저 나와서 'num_id'가 없는 경우
-                if image_context:
+                if image_passage:
                     cur_data_set['num_id'] += '-IC'
-                    image_context = False
-                if preprocess_context:
+                    image_passage = False
+                if preprocess_passage:
                     cur_data_set['num_id'] += '-PC'
-                    preprocess_context = False
+                    preprocess_passage = False
                 if etc:
                     cur_data_set['num_id'] += '-ETC'
             else: pass
