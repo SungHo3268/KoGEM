@@ -6,18 +6,16 @@ import requests
 from tqdm import tqdm
 
 
-data_name = "school_qual_exam"      # e.g., mock_high1, mock_high2, mock_high3, suneung, school_qual_exam, local_office7, local_office9, national_office7, national_office9
-# affix = ""
-affix = "_dropped"
+data_name = "CSAT"      # e.g., 'NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)', 'CSAT', 'HSQE', 'LCSE(G9)', 'LCSE(G7)', 'NCSE(G9)', 'NCSE(G7)'
 
 
-data_dir = f"datasets/{data_name}/scrapped{affix}"
+data_dir = f"datasets/{data_name}/scrapped"
 file_list = os.listdir(data_dir)
 file_list.sort()
 
-if data_name in ["mock_high1", "mock_high2", "mock_high3", "suneung"]:
+if data_name in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)', 'CSAT']:
     num_cands = 5
-elif data_name in ['school_qual_exam', 'local_office7', 'local_office9', 'national_office7', 'national_office9']:
+elif data_name in ['HSQE', 'LCSE(G9)', 'LCSE(G7)', 'NCSE(G9)', 'NCSE(G7)']:
     num_cands = 4
 else:
     raise NotImplementedError
@@ -26,19 +24,19 @@ else:
 for file_name in tqdm(file_list, desc="Checking file_name format...", bar_format="{l_bar}{bar:15}{r_bar}"):
     f_name, file_ext = file_name.split(".")
     year = f_name.split("_")[0]
-    if data_name in ["mock_high1", "mock_high2", "mock_high3"]:
+    if data_name in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)']:
         month = f_name.split("_")[1]
         if f_name.split("_")[2] in ['A', 'B', '언매']:
             detail = f_name.split("_")[2]
         else:
             detail = ''
-    elif data_name in ["suneung", "local_office7", "local_office9", "national_office7", "national_office9"]:       # 1년에 한 번
+    elif data_name in ['CSAT', 'LCSE(G9)', 'LCSE(G7)', 'NCSE(G9)', 'NCSE(G7)']:       # Once a year
         if f_name.split("_")[1] in ['A', 'B', '언매', '가', '나', '다', '책', '책2', '인', '사', 'S',
                                     '고', '공', '봉', '인', '우', '2책', '3형']:
             detail = f_name.split("_")[1]
         else:
             detail = ''
-    elif data_name in ['school_qual_exam', ]:           # 1년에 두 번
+    elif data_name in ['HSQE', ]:           # Twice a year
         rnd = f_name.split("_")[1]
         if f_name.split("_")[2] in ['A', 'O']:
             detail = f_name.split("_")[2]
@@ -72,19 +70,19 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
     f_name, file_ext = file_name.split(".")
     year = f_name.split("_")[0]
     etc = False
-    if data_name in ["mock_high1", "mock_high2", "mock_high3"]:
+    if data_name in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)']:
         month = f_name.split("_")[1]
         if f_name.split("_")[2] in ['A', 'B', '언매']:
             detail = f_name.split("_")[2]
         else:
             detail = ''
-    elif data_name in ["suneung", "local_office7", "local_office9", 'national_office7', 'national_office9']:       # e.g., suneung
+    elif data_name in ['CSAT', 'LCSE(G9)', 'LCSE(G7)', 'NCSE(G9)', 'NCSE(G7)']:       # e.g., suneung
         if f_name.split("_")[1] in ['A', 'B', '언매', '가', '나', '다', '책', '책2', '인', '사', 'S',
                                     '고', '공', '봉', '인', '우', '2책', '3형']:
             detail = f_name.split("_")[1]
         else:
             detail = ''
-    elif data_name in ['school_qual_exam']:
+    elif data_name in ['HSQE']:
         rnd = f_name.split("_")[1]
         if f_name.split("_")[2] in ['A', 'O']:
             detail = f_name.split("_")[2]
@@ -124,8 +122,8 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
         ####################################
         # HyperCLOVA X OCR REQUEST & PARSE #
         ####################################
-        api_url = open("utils/clovax_ocr_api_url.txt", 'r').readline().strip()
-        secret_key = open('utils/clovax_ocr_api_key.txt', 'r').readline().strip()
+        api_url = open("api_tokens/clovax_ocr_api_url.txt", 'r').readline().strip()
+        secret_key = open('api_tokens/clovax_ocr_api_key.txt', 'r').readline().strip()
         image_file = os.path.join(data_dir, f_name + '.' + file_ext)
 
         request_json = {
@@ -215,15 +213,15 @@ for file_name in tqdm(file_list, desc="Extracting data from scrapped images", ba
             else:
                 num = f_name.split("_")[-2]
 
-            if data_name in ["mock_high1", "mock_high2", "mock_high3"]:
+            if data_name in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)']:
                 cur_data_set['num_id'] = '-'.join([year, month, num])
                 if detail:
                     cur_data_set['num_id'] = '-'.join([year, month, detail, num])
-            elif data_name in ["suneung", "local_office7", "local_office9", "national_office7", "national_office9"]:
+            elif data_name in ['CSAT', 'LCSE(G9)', 'LCSE(G7)', 'NCSE(G9)', 'NCSE(G7)']:
                 cur_data_set['num_id'] = '-'.join([year, num])
                 if detail:
                     cur_data_set['num_id'] = '-'.join([year, detail, num])
-            elif data_name in ['school_qual_exam']:
+            elif data_name in ['HSQE']:
                 cur_data_set['num_id'] = '-'.join([year, rnd, num])
                 if detail:
                     cur_data_set['num_id'] = '-'.join([year, rnd, detail, num])
@@ -274,7 +272,7 @@ if cur_data_set['num_id'] != '':
 #       Save extracted data       #
 ###################################
 save_dir = os.path.dirname(data_dir)
-save_path = os.path.join(save_dir, f"(before)extracted{affix}.json")
+save_path = os.path.join(save_dir, f"(before)extracted.json")
 json.dump(total_data, open(save_path, "w"), indent=2, ensure_ascii=False)
 
 answers = list()
@@ -284,5 +282,5 @@ for line in total_data:
         'label': -1
     }
     answers.append(cur_ans_data)
-ans_save_path = os.path.join(save_dir, f"(before)answers{affix}.json")
+ans_save_path = os.path.join(save_dir, f"(before)answers.json")
 json.dump(answers, open(ans_save_path, "w"), indent=2, ensure_ascii=False)

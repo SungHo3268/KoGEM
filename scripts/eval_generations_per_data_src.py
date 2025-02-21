@@ -54,11 +54,6 @@ kogem_info = json.load(open("utils/KoGEM_info.json", "r"))
 major = kogem_info["major_categories"]
 sub = kogem_info["sub_categories"]
 data_srcs = kogem_info["data_srcs"]
-# major = ["음운론", "형태론", "통사론", "의미론", "규범", "복합"]
-# sub = ["음운체계", "음운변동", "형태소", "품사", "단어의 짜임", "문장의 짜임", "문법요소", "단순어휘", "어휘의미론", "화용론",
-#        "표준어", "맞춤법", "로마자표기법", "표준발음법", "외래어표기법", "규범 복합", "복합"]
-# data_srcs = ["mock_high1", "mock_high2", "mock_high3", "suneung",
-#              "school_qual_exam", "local_office9", "local_office7", "national_office9", "national_office7"]
 
 
 datasets_per_srcs = {src: [] for src in data_srcs}
@@ -96,29 +91,6 @@ for data_src in datasets_per_srcs:
     print(f"[ Data Source: {data_src} ]")
     print("############################################")
 
-    # print("Total Results")
-    # cor = sum([major_results[cat][0] for cat in major_results])
-    # total = sum([major_results[cat][1] for cat in major_results])
-    # print(f"{cor}/{total} ({cor/total*100:.2f} [%])")
-    # print("")
-    #
-    # print("Major Categories")
-    # for cat in major_results:
-    #     cor, total = major_results[cat]
-    #     if total == 0:
-    #         print(f"{cat}: -")
-    #     else:
-    #         print(f"{cat}: {cor}/{total} ({cor/total*100:.2f} [%])")
-    # print("")
-    #
-    # print("Sub Categories")
-    # for cat in sub_results:
-    #     cor, total = sub_results[cat]
-    #     if total == 0:
-    #         print(f"{cat}: -")
-    #     else:
-    #         print(f"{cat}: {cor}/{total} ({cor/total*100:.2f} [%])")
-    # print("\n")
 
     print("Total Results")
     cor = sum([major_results[cat][0] for cat in major_results])
