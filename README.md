@@ -1,10 +1,14 @@
 # Polishing Every Facet of the GEM: Testing Linguistic Competence in LLMs and Humans
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
+[![KOGL TYPE 1][kogl-1-shield]][kogl-1]
 [![Dataset on HF][hf-data-shield]][hf-data]
 
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 [cc-by]: https://creativecommons.org/licenses/by/4.0/
+
+[kogl-1-shield]: https://img.shields.io/badge/License-KOGLE%20Type1%20-lightgreen.svg
+[kogl-1]: https://www.kogl.or.kr/info/license.do
 
 [hf-data-shield]: https://img.shields.io/badge/🤗.-Dataset%20Card-blue.svg
 [hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
@@ -131,10 +135,10 @@ This work is licensed under a [Creative Commons Attribution 4.0 International Li
 
 This work is used according to [Korea Open Government License (KOGL) Type 1](https://www.kogl.or.kr/info/license.do). <br/>
 
-[![KOGL TYPE 1][kogl-1-shield]][kogl-1]
+[![KOGL ORIGINAL TYPE 1][kogl-original-1-shield]][kogl-original-1]
 
-[kogl-1]: https://www.kogl.or.kr/info/license.do
-[kogl-1-shield]: https://www.kogl.or.kr/static/kogl/img/sub/number1.jpg
+[kogl-original-1-shield]: https://www.kogl.or.kr/static/kogl/img/sub/number1.jpg
+[kogl-original-1]: https://www.kogl.or.kr/info/license.do
 
 
 
