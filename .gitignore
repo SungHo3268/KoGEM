@@ -7,3 +7,6 @@ api_tokens/
 *_key.txt
 *_url.txt
 logs/
+*.pdf
+extract_que_*
+eval_human*
