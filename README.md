@@ -130,6 +130,15 @@ A closer examination of individual subcategories. These results reveal distinct 
 </br></br>
 
 
+## Statistics of the Prompt Lengths
+
+</br>
+<img src='analysis/assets/figures/lengths_passage_paragraph.png' width='70%'>
+
+</br></br>
+
+
+
 ## License
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
 
