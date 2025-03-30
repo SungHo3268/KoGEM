@@ -132,6 +132,13 @@ A closer examination of individual subcategories. These results reveal distinct 
 </br>
 <img src='analysis/assets/figures/subcategory_results.png' width='90%'>
 
+<br>
+### Label Distribution: Gold Labels vs. Model Predictions
+This graph compares the label distribution of the gold labels with the distribution of predictions made by the representative model.
+
+
+f
+
 </br></br>
 
 
