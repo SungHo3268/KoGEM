@@ -50,11 +50,16 @@ This repository is associated with a paper currently under review. <br/>
 <ins><b>Notice) We plan to upload our benchmark and generation results upon acceptance.</b></ins>
 <br/><br/>
 
-This presents the components and statistics of our proposed dataset, KoGEM. Our benchmark consists of a total of 1,524 annotated QA pairs. More detailed information about KoGEM can be found in our paper.
+- KoGEM Texanomy
+    This presents the components and statistics of our proposed dataset, KoGEM. Our benchmark consists of a total of 1,524 annotated QA pairs. More detailed information about KoGEM can be found in our paper.
 
-</br>
-<img src='analysis/assets/figures/texanomy_distributions.png' width='70%'>
+    <img src='analysis/assets/figures/texanomy_distributions.png' width='70%'>
+    </br>
 
+
+- Statistics of the Prompt Lengths
+
+    <img src='analysis/assets/figures/lengths_passage_paragraph.png' width='60%'>
 
 </br></br>
 
@@ -126,14 +131,6 @@ A closer examination of individual subcategories. These results reveal distinct 
 
 </br>
 <img src='analysis/assets/figures/subcategory_results.png' width='90%'>
-
-</br></br>
-
-
-## Statistics of the Prompt Lengths
-
-</br>
-<img src='analysis/assets/figures/lengths_passage_paragraph.png' width='70%'>
 
 </br></br>
 
