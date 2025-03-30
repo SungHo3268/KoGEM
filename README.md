@@ -50,7 +50,7 @@ This repository is associated with a paper currently under review. <br/>
 <ins><b>Notice) We plan to upload our benchmark and generation results upon acceptance.</b></ins>
 <br/><br/>
 
-- KoGEM Texanomy
+- KoGEM Texanomy <br/>
     This presents the components and statistics of our proposed dataset, KoGEM. Our benchmark consists of a total of 1,524 annotated QA pairs. More detailed information about KoGEM can be found in our paper.
 
     <img src='analysis/assets/figures/texanomy_distributions.png' width='70%'>
@@ -133,11 +133,12 @@ A closer examination of individual subcategories. These results reveal distinct 
 <img src='analysis/assets/figures/subcategory_results.png' width='90%'>
 
 <br>
-### Label Distribution: Gold Labels vs. Model Predictions
+
+### Label Distribution: Gold Labels vs. Model Predictions <br/>
 This graph compares the label distribution of the gold labels with the distribution of predictions made by the representative model.
 
 
-f
+<img src='analysis/assets/figures/label_distributions.png' width='60%'>
 
 </br></br>
 
