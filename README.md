@@ -59,7 +59,7 @@ This repository is associated with a paper currently under review. <br/>
 
 - Statistics of the Prompt Lengths
 
-    <img src='analysis/assets/figures/lengths_passage_paragraph.png' width='60%'>
+    <img src='analysis/assets/figures/prompt_length_statistics.png' width='60%'>
 
 </br></br>
 
@@ -133,6 +133,12 @@ A closer examination of individual subcategories. These results reveal distinct 
 <img src='analysis/assets/figures/subcategory_results.png' width='90%'>
 
 <br>
+
+### Cummulative Zero-shot Evaluation Resultsfor Each Subcategory <br/>
+
+<img src='analysis/assets/figures/subcategory_cumulative.png' width='60%'>
+
+</br>
 
 ### Label Distribution: Gold Labels vs. Model Predictions <br/>
 This graph compares the label distribution of the gold labels with the distribution of predictions made by the representative model.
