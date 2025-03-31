@@ -17,7 +17,7 @@ We provide specific QA examples for each main linguistic category of KoGEM, offe
 ## Norms
 <img src='https://github.com/SungHo3268/KoGEM/blob/main/examples/category/example_norms.png' width='100%'>
 
-
+<br/><br/><br/>
 # Examples for Each Prompt Design
 
 ## Question + Choices
