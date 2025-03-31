@@ -134,7 +134,7 @@ A closer examination of individual subcategories. These results reveal distinct 
 
 <br>
 
-### Cummulative Zero-shot Evaluation Resultsfor Each Subcategory <br/>
+### Cummulative Zero-shot Evaluation Results for Each Subcategory <br/>
 
 <img src='analysis/assets/figures/subcategory_cumulative.png' width='80%'>
 
