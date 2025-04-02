@@ -36,7 +36,7 @@ This repository is associated with a paper currently under review. <br/>
 
 4. Install the torch toolkit</br>
   Before downloading this Torch package, you should check the compatibility of your CUDA settings.<br/>
-  ( I used CUDA 12.2 and cuDNN 8.9.6 with NVIDIA driver 535.183.01 )
+  ( We used CUDA 12.2 and cuDNN 8.9.6 with NVIDIA driver 535.183.01 )
     ```
     pip install torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
     ```
