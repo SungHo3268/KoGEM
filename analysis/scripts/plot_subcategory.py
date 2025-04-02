@@ -127,14 +127,14 @@ plt.xticks(rotation=45, ha='right', fontsize=14, fontweight='bold')
 plt.tick_params(axis='x', direction='out', length=6)
 plt.yticks(fontsize=14)
 plt.tick_params(axis='y', direction='out', length=6)
-plt.ylabel('Score', fontsize=18, fontweight='bold')  # Increase y-axis label font size
+plt.ylabel('Accuracy Score', fontsize=18, fontweight='bold')  # Increase y-axis label font size
 plt.grid(axis='y', linestyle='--', linewidth=0.8, alpha=0.7, color='gray')
 
 handles, labels = plt.gca().get_legend_handles_labels()
 new_handles = handles[1: 4] + handles[:1] + handles[4:]
 new_labels = labels[1: 4] + labels[:1] + labels[4:]
 plt.legend(
-    fontsize=12,
+    fontsize=16,
     loc='center left',
     bbox_to_anchor=(1.05, 0.5),  # Move legend to the right outside the plot
     fancybox=True,
@@ -157,7 +157,8 @@ plt.gca().spines['left'].set_color('black')
 # Save the figure
 save_dir = "analysis/assets/figures/"
 os.makedirs(save_dir, exist_ok=True)
-plt.savefig(os.path.join(save_dir, "subcategory_v1.0.pdf"), format='png', dpi=300, bbox_inches='tight', transparent=True)
+plt.savefig(os.path.join(save_dir, "subcategory_v1.1.png"), format='png', dpi=300, bbox_inches='tight', transparent=True)
+plt.savefig(os.path.join(save_dir, "subcategory_v1.1.pdf"), format='pdf')
 plt.show()
 
 plt.close()

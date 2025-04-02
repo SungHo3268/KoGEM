@@ -37,9 +37,9 @@ s1-32B
 Llama-3.1-8B-Instruct
 """
 
-model_type = "s1-32B"
-model_var = "gpt-4o-mini"
-eval_method = "0"          # 0, 1, 5, 'each_major_one', 'each_sub_one'
+model_type = "EXAONE-3.5-32B-Instruct"
+model_var = "claude-3-5-sonnet-20240620"
+eval_method = "5"          # 0, 1, 5, 'each_major_one', 'each_sub_one'
 cot = False
 cot_file_index = "_cot" if cot else ""
 

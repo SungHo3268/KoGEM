@@ -169,18 +169,18 @@ def make_prompts(args, data, examples):
         else:
             pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 질문에 대한 정답으로 올바른 번호를 선택지에서 고르고, 그에 맞는 해설을 100자 내로 설명하시오."
 
-    if args.shot_num != 0:
+    if args.shot_num != str(0):
         # pre_prompt
         if passage.strip != '':
             if paragraph.strip != '':
-                pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 지문과 설명을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르시오."
+                pre_prompt = f"다음은 한국어 언어 이해를 평가하는 객관식 문제입니다. 앞의 {args.shot_num}개의 문제와 정답 예시를 참고한 후, 마지막에 제시된 지문과 설명을 바탕으로 질문에 대한 올바른 정답 번호를 선택지에서 고르세요."
             else:
-                pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 지문을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르시오."
+                pre_prompt = "다음은 한국어 언어 이해를 평가하는 객관식 문제입니다. 앞의 {args.shot_num}개의 문제와 정답 예시를 참고한 후, 마지막에 제시된 지문을 바탕으로 질문에 대한 올바른 정답 번호를 선택지에서 고르세요."
         else:
             if paragraph.strip != '':
-                pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 설명을 보고, 질문에 대한 정답으로 올바른 번호를 선택지에서 고르시오."
+                pre_prompt = "다음은 한국어 언어 이해를 평가하는 객관식 문제입니다. 앞의 {args.shot_num}개의 문제와 정답 예시를 참고한 후, 마지막에 제시된 설명을 바탕으로 질문에 대한 올바른 정답 번호를 선택지에서 고르세요."
             else:
-                pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 질문에 대한 정답으로 올바른 번호를 선택지에서 고르시오."
+                pre_prompt = "다음은 한국어 언어 이해를 평가하는 객관식 문제입니다. 앞의 {args.shot_num}개의 문제와 정답 예시를 참고한 후, 마지막에 제시된 질문에 대한 올바른 정답 번호를 선택지에서 고르세요."
 
         example_prompts = []
         example_answers = []
@@ -237,7 +237,7 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
     if (('llama-3' in args.torch_model_name.lower()) or
             ('KORani-v3' in args.torch_model_name) or
             ('KULLM3' in args.torch_model_name)):
-        if args.shot_num != 0:
+        if args.shot_num != str(0):
             messages = [
                 {"role": "system",
                  "content": f"{pre_prompt}"}
@@ -261,7 +261,7 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
                  "content": f"{prompt}"},
             ]
     elif 'gemma' in args.torch_model_name:
-        if args.shot_num != 0:
+        if args.shot_num != str(0):
             messages = [
                 {"role": "user",
                  "content": f"{pre_prompt}"}
@@ -283,7 +283,7 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
                  "content": f"{pre_prompt + prompt}"},
             ]
     elif 'deepseek' in args.torch_model_name:       # It must be located in advance of Qwen.
-        if args.shot_num != 0:
+        if args.shot_num != str(0):
             messages = [
                 {"role": "user",
                  "content": f"{pre_prompt}"}
@@ -316,10 +316,13 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
         else:
             raise NotImplementedError
 
-        if args.shot_num != 0:
+        if args.shot_num != str(0):
             messages = [
                 {"role": "system",
-                 "content": f"{set_role + ' ' + pre_prompt}"}
+                 # "content": f"{set_role + ' ' + pre_prompt}"},
+                 "content": f"{set_role}"},
+                {"role": "user",
+                 "content": pre_prompt},
             ]
             for ex_prompt, ex_ans in zip(example_prompts, example_answers):
                 messages.extend([
@@ -332,6 +335,7 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
                 {"role": "user",
                  "content": prompt},
             ])
+            messages[-1]["content"] = messages[-1]["content"].replace("정답: ", "대답은 선택지 중 **단 한 개만 골라 번호만 말하시오.**. 정답: ")
         else:
             messages = [
                 {"role": "system",
@@ -340,7 +344,7 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
                  "content": f"{prompt}"},
             ]
     else:
-        if args.shot_num != 0:
+        if args.shot_num != str(0):
             messages = pre_prompt + '\n'
             for ex_prompt, ex_ans in zip(example_prompts, example_answers):
                 messages += ex_prompt + '\n' + ex_ans + '\n'
@@ -350,7 +354,7 @@ def get_messages(args, pre_prompt, prompt, example_prompts, example_answers):
     return messages
 
 
-def get_response(args, messages, model, tokenizer):
+def get_response(args, messages, model, tokenizer, temperature=1e-10, do_sample=False):
     if ('llama-3' in args.torch_model_name.lower()) or ('KORani-v3' in args.torch_model_name) or ('KULLM3' in args.torch_model_name):
         tokens = tokenizer.apply_chat_template(
             messages,
@@ -368,7 +372,7 @@ def get_response(args, messages, model, tokenizer):
             pad_token_id=tokenizer.eos_token_id,
             # do_sample=False,
             top_p=None,
-            temperature=1e-10,
+            temperature=temperature,
             repetition_penalty=args.repeat_penalty
         )
         outputs = [
@@ -393,8 +397,9 @@ def get_response(args, messages, model, tokenizer):
             tokens.to(model.device),
             max_new_tokens=args.max_new_tokens,
             pad_token_id=tokenizer.eos_token_id,
-            temperature=1e-10,
-            # do_sample=False,
+            temperature=temperature,
+            do_sample=True,
+            top_p=0.9
         )
         generated = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
         ender = "[|assistant|]"
@@ -431,7 +436,7 @@ def get_response(args, messages, model, tokenizer):
         generated_ids = model.generate(
             **model_inputs,
             max_new_tokens=1000,
-            temperature=1e-10,
+            temperature=temperature,
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
@@ -447,7 +452,7 @@ def get_response(args, messages, model, tokenizer):
         generated_ids = model.generate(
             **model_inputs,
             max_new_tokens=args.max_new_tokens,
-            temperature=1e-10 if 'Qwen' in args.torch_model_name else 0,
+            temperature=temperature if 'Qwen' in args.torch_model_name else 0,
             # do_sample=False
         )
         generated_ids = [
@@ -461,7 +466,7 @@ def get_response(args, messages, model, tokenizer):
                                     max_new_tokens=args.max_new_tokens,
                                     pad_token_id=tokenizer.eos_token_id,
                                     repetition_penalty=args.repeat_penalty,
-                                    temperature=1e-10,
+                                    temperature=temperature,
                                     # do_sample=False
                                     )
         generated = tokenizer.batch_decode(gen_tokens)[0]
@@ -488,8 +493,9 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                 continue
 
             dataset = total_dataset[i * args.batch_size: (i+1) * args.batch_size]
-            if args.shot_num != 0:
-                if args.shot_num == 'each_major_one':
+
+            def get_examples(dataset, shot_num):
+                if shot_num == 'each_major_one':
                     major = kogem_info["major_categories"]
                     major_data_ids = {cat: [] for cat in major}
                     for d_id, data in enumerate(dataset):
@@ -497,7 +503,7 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                     random_ids = []
                     for cat in major:
                         random_ids.append(random.choice(major_data_ids[cat]))
-                elif args.shot_num == 'each_sub_one':
+                elif shot_num == 'each_sub_one':
                     sub = kogem_info["sub_categories"]
                     sub_data_ids = {cat: [] for cat in sub}
                     for d_id, data in enumerate(dataset):
@@ -505,8 +511,8 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                     random_ids = []
                     for cat in sub:
                         random_ids.append(random.choice(sub_data_ids[cat]))
-                elif type(args.shot_num) == int and args.shot_num != 0:
-                    random_ids = [random.randint(0, len(dataset)) for _ in range(args.shot_num)]
+                elif shot_num in [str(sn) for sn in range(10)]:
+                    random_ids = [random.randint(0, len(dataset) - 1) for _ in range(int(shot_num))]
                 else:
                     raise NotImplementedError
 
@@ -516,25 +522,40 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                     if idx not in random_ids:
                         new_dataset.append(data)
 
-                dataset = new_dataset
+                # dataset = new_dataset
+                return examples, new_dataset
+
+            if args.shot_num != str(0):
+                examples, new_dataset = get_examples(dataset, args.shot_num)
             else:
                 examples = None
+                new_dataset = dataset
 
             ##################################
             #        Prompt Evaluation       #
             ##################################
-            for n, data in tqdm(enumerate(dataset), total=len(dataset),
+            for n, data in tqdm(enumerate(new_dataset), total=len(new_dataset),
                                 desc=f"({i + 1}/{batch_num}) th Generating answers using '{args.torch_model_name}' model with {args.shot_num}-shot eval...",
                                 bar_format="{l_bar}{bar:15}{r_bar}"):
 
                 if ('deepseek' in args.torch_model_name) or ('s1' in args.torch_model_name):
                     thinking_time = time()
+
                 cand_num, pre_prompt, prompt, label, example_prompts, example_answers = make_prompts(args, data, examples)
-
                 messages = get_messages(args, pre_prompt, prompt, example_prompts, example_answers)
-                generated_text = get_response(args, messages, model, tokenizer)
 
+                num_repeat = 0
+                temperature = 1e-10
+                do_sample = False
+                generated_text = ''
+                while generated_text == '' and num_repeat < 10:
+                    generated_text = get_response(args, messages, model, tokenizer, temperature, do_sample).strip()
+                    if generated_text == '':
+                        num_repeat += 1
+                        temperature += 0.1
+                        do_sample = True
                 if generated_text.strip() == '':
+                    generated_text = "[ERROR] CANNOT_GENERATE"
                     ans = '-1'
                 else:
                     if 'deepseek' in args.torch_model_name:
@@ -615,6 +636,8 @@ def zeroshot_eval(args, total_dataset, tokenizer, model):
                     end_inf_time = time() - thinking_time
                     data["elapsed_time"] = f"{int(end_inf_time//60)}m {int(end_inf_time%60)}s"
 
+            dataset = new_dataset
+
             ###################################
             #       Save the Predictions      #
             ###################################
@@ -686,7 +709,7 @@ if __name__ == "__main__":
     parser.add_argument('--output_dir', type=str, default="")
     parser.add_argument('--seed', type=int, default=123)
     parser.add_argument('--batch_size', type=int, default=100)
-    parser.add_argument('--shot_num', type=Union[str, int], default=0, help="0  ||  1  ||  5  ||  each_major_one  ||  each_sub_one")
+    parser.add_argument('--shot_num', type=str, default=0, help="0  ||  1  ||  5  ||  each_major_one  ||  each_sub_one")
     parser.add_argument('--continue_batch_num', type=int, default=0)
     args = parser.parse_args()
 

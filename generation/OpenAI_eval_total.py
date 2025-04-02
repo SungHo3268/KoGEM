@@ -28,6 +28,7 @@ parser.add_argument('--model_var', type=str, required=True,
 parser.add_argument('--access_token_path', type=str, required=True)
 parser.add_argument('--batch_size', type=int, default=100)
 parser.add_argument('--max_tokens', type=int, default=200)
+parser.add_argument('--shot_num', type=str, default=0, help="0  ||  1  ||  5  ||  each_major_one  ||  each_sub_one")
 args = parser.parse_args()
 
 
@@ -64,8 +65,6 @@ batch_num = len(total_dataset) // batch_size + 1
 ################################
 #     Experimental settings    #
 ################################
-shot_num = '0'        # 0, 1, 5, 'each_major_one', 'each_sub_one'
-
 max_tokens = args.max_tokens
 
 output_dir = f"logs/OpenAI/"
@@ -80,8 +79,8 @@ cannot_generate = 0
 for i in range(batch_num):
     dataset = total_dataset[i*batch_size: (i+1)*batch_size]
 
-    if shot_num != str(0):
-        if shot_num == 'each_major_one':
+    if args.shot_num != str(0):
+        if args.shot_num == 'each_major_one':
             major = kogem_info["major_categories"]
             major_data_ids = {cat: [] for cat in major}
             for d_id, data in enumerate(dataset):
@@ -89,7 +88,7 @@ for i in range(batch_num):
             random_ids = []
             for cat in major:
                 random_ids.append(random.choice(major_data_ids[cat]))
-        elif shot_num == 'each_sub_one':
+        elif args.shot_num == 'each_sub_one':
             sub = kogem_info["sub_categories"]
             sub_data_ids = {cat: [] for cat in sub}
             for d_id, data in enumerate(dataset):
@@ -97,8 +96,8 @@ for i in range(batch_num):
             random_ids = []
             for cat in sub:
                 random_ids.append(random.choice(sub_data_ids[cat]))
-        elif type(shot_num) == int and shot_num != str(0):
-            random_ids = [random.randint(0, len(dataset)) for _ in range(shot_num)]
+        elif args.shot_num in [str(sn) for sn in range(10)]:
+            random_ids = [random.randint(0, len(dataset) - 1) for _ in range(int(args.shot_num))]
         else:
             raise NotImplementedError
 
@@ -115,7 +114,7 @@ for i in range(batch_num):
     #        Prompt Evaluation       #
     ##################################
     for n, data in tqdm(enumerate(dataset), total=len(dataset),
-                        desc=f"({i+1}/{batch_num}) th Generating answers using '{model_var}' model with {shot_num}-shot eval...",
+                        desc=f"({i+1}/{batch_num}) th Generating answers using '{model_var}' model with {args.shot_num}-shot eval...",
                         bar_format="{l_bar}{bar:15}{r_bar}"):
         if data['data_src'] in ['NUAT(HS1)', 'NUAT(HS2)', 'NUAT(HS3)', 'CSAT']:
             cand_num = 5
@@ -142,7 +141,7 @@ for i in range(batch_num):
             else:
                 pre_prompt = "다음은 한국어 언어 이해에 대한 객관식 문제입니다. 주어진 질문에 대한 정답으로 올바른 번호를 선택지에서 고르고, 그에 맞는 해설을 100자 내로 설명하시오."
 
-        if shot_num != str(0):
+        if args.shot_num != str(0):
             # pre_prompt
             if passage.strip != '':
                 if paragraph.strip != '':
@@ -210,7 +209,7 @@ for i in range(batch_num):
         generated_text = ''
         random_select = False
         while prediction == '' and num_repeat < 5:
-            if shot_num != str(0):
+            if args.shot_num != str(0):
                 messages = [
                     {
                         "role": "system",
@@ -295,7 +294,7 @@ for i in range(batch_num):
     #       Save the Predictions      #
     ###################################
     json.dump(dataset,
-              open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions_{i}th.json"), "w", encoding="utf-8"),
+              open(os.path.join(output_dir, f"{model_var}_{args.shot_num}_shot_predictions_{i}th.json"), "w", encoding="utf-8"),
               ensure_ascii=False,
               indent=2
               )
@@ -307,22 +306,22 @@ for i in range(batch_num):
 # Aggregate all saved files
 all_dataset = []
 for i in range(batch_num):
-    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions_{i}th.json"), "r"))
+    dataset = json.load(open(os.path.join(output_dir, f"{model_var}_{args.shot_num}_shot_predictions_{i}th.json"), "r"))
     all_dataset.extend(dataset)
 
 
 print(f"Zero-shot Accuracy: {acc / len(all_dataset) * 100:.2f} [%]")
 print(f"Cannot generate: {cannot_generate}/ {len(all_dataset)} ({cannot_generate / len(all_dataset) * 100:.2f} [%])")
 json.dump(all_dataset,
-            open(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions.json"), "w", encoding="utf-8"),
-            ensure_ascii=False,
-            indent=2
-            )
+          open(os.path.join(output_dir, f"{model_var}_{args.shot_num}_shot_predictions.json"), "w", encoding="utf-8"),
+          ensure_ascii=False,
+          indent=2
+          )
 
 
 # remove previous files
 for i in range(batch_num):
-    os.remove(os.path.join(output_dir, f"{model_var}_{shot_num}_shot_predictions_{i}th.json"))
+    os.remove(os.path.join(output_dir, f"{model_var}_{args.shot_num}_shot_predictions_{i}th.json"))
 
 print("All predictions are saved.")
 print("Done.")
