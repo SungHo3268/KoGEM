@@ -15,6 +15,9 @@
 
 
 This repository is associated with a paper currently under review. <br/>
+<br/>
+You can downlaod the data samples [here](https://drive.google.com/file/d/11NsDA3gX1s7Jmk2RovDI66cN_R_EStWo/view?usp=sharing). <br/>
+<ins><b>Notice) We plan to upload our full benchmark and generation results upon acceptance in huggingface.</b></ins>
 <br/><br/>
 
 
@@ -46,8 +49,6 @@ This repository is associated with a paper currently under review. <br/>
 
 ## KoGEM (<ins>Ko</ins>rean <ins>G</ins>rammar <ins>E</ins>valuation Bench<ins>M</ins>ark)
 
-<br/>
-<ins><b>Notice) We plan to upload our benchmark and generation results upon acceptance.</b></ins>
 <br/><br/>
 
 - KoGEM Texanomy <br/>
