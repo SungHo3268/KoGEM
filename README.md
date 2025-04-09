@@ -48,7 +48,7 @@ You can download the data samples from [here](https://drive.google.com/uc?export
 
 ## KoGEM (<ins>Ko</ins>rean <ins>G</ins>rammar <ins>E</ins>valuation Bench<ins>M</ins>ark)
 
-- KoGEM Texanomy <br/>
+- KoGEM Taxonomy <br/>
     This presents the components and statistics of our proposed dataset, KoGEM. Our benchmark consists of a total of 1,524 annotated QA pairs. More detailed information about KoGEM can be found in our paper.
 
     <img src='analysis/assets/figures/taxonomy_distributions.png' width='70%'>
