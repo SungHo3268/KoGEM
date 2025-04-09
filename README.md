@@ -1,4 +1,4 @@
-# Polishing Every Facet of the GEM: Testing Linguistic Competence in LLMs and Humans
+# Polishing Every Facet of the GEM: Testing Linguistic Competence of LLMs and Humans in Korean
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 [![KOGL TYPE 1][kogl-1-shield]][kogl-1]
@@ -16,7 +16,7 @@
 
 This repository is associated with a paper currently under review. <br/>
 <br/>
-You can downlaod the data samples [here](https://drive.google.com/file/d/11NsDA3gX1s7Jmk2RovDI66cN_R_EStWo/view?usp=sharing). <br/>
+You can download the data samples from [here](https://drive.google.com/uc?export=download&id=1urfI0Nwl4lgLb_JtTjdmgxCB8mfWTf7B). <br/>
 <ins><b>Notice) We plan to upload our full benchmark and generation results upon acceptance in huggingface.</b></ins>
 <br/><br/>
 
