@@ -10,7 +10,6 @@ import argparse
 from time import time
 from tqdm import tqdm
 from huggingface_hub import login
-from typing import Union
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForCausalLM
 
 sys.path.append(os.getcwd())

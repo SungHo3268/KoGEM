@@ -54,7 +54,7 @@ You can downlaod the data samples [here](https://drive.google.com/file/d/11NsDA3
 - KoGEM Texanomy <br/>
     This presents the components and statistics of our proposed dataset, KoGEM. Our benchmark consists of a total of 1,524 annotated QA pairs. More detailed information about KoGEM can be found in our paper.
 
-    <img src='analysis/assets/figures/texanomy_distributions.png' width='70%'>
+    <img src='analysis/assets/figures/taxonomy_distributions.png' width='70%'>
     </br>
 
 
