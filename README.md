@@ -14,12 +14,10 @@
 [hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
 
 
-This repository is associated with a paper currently under review. <br/>
-<br/>
-You can download the data samples from [here](https://drive.google.com/uc?export=download&id=1urfI0Nwl4lgLb_JtTjdmgxCB8mfWTf7B). <br/>
-<ins><b>Notice) We plan to upload our full benchmark and generation results upon acceptance in huggingface.</b></ins>
-<br/><br/>
+This paper is accpeted to ACL 2025.
 
+
+</br>
 
 ## Environment Settings
 1. Create the virtual environment.
