@@ -14,7 +14,10 @@
 [hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
 
 
-This paper is accpeted to ACL 2025.
+This paper is accpeted to ACL 2025 main.
+
+*SungHo Kim, Nayeon Kim, Taehee Jeon, SangKeun Lee*
+
 
 
 </br>
