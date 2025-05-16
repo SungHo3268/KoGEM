@@ -16,7 +16,7 @@
 
 This paper is accpeted to ACL 2025 main.
 
-*SungHo Kim, Nayeon Kim, Taehee Jeon, SangKeun Lee*
+*SungHo Kim<sup>\*</sup>, Nayeon Kim<sup>\*</sup>, Taehee Jeon, SangKeun Lee*
 
 
 
