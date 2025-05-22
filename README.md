@@ -133,7 +133,7 @@ A closer examination of individual subcategories. These results reveal distinct 
 
 <br>
 
-### Cummulative Zero-shot Evaluation Results for Each Subcategory <br/>
+### Top-k Zero-shot Performance Variation Across Subcategories <br/>
 
 <img src='analysis/assets/figures/subcategory_cumulative.png' width='80%'>
 
