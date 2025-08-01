@@ -3,6 +3,9 @@
 [![CC BY 4.0][cc-by-shield]][cc-by]
 [![KOGL TYPE 1][kogl-1-shield]][kogl-1]
 [![Dataset on HF][hf-data-shield]][hf-data]
+[![ACL Paper][acl-paper-shield]][acl-paper]
+
+
 
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg
 [cc-by]: https://creativecommons.org/licenses/by/4.0/
@@ -13,9 +16,13 @@
 [hf-data-shield]: https://img.shields.io/badge/🤗.-Dataset%20Card-blue.svg
 [hf-data]: https://huggingface.co/datasets/Poppo/KoGEM
 
+[acl-paper-shield]: https://img.shields.io/badge/📋.-%20ACL_Paper%20-red.svg
+[acl-paper]: https://aclanthology.org/2025.acl-long.492/
 
-This paper is accepted to ACL 2025 main. - [arXiv](https://arxiv.org/abs/2506.01237)
+[acl-paper-shield]: https://img.shields.io/badge/📋.-%20ACL_Paper%20-red.svg
+[acl-paper]: https://aclanthology.org/2025.acl-long.492/
 
+This paper is accepted to ACL 2025 main.
 *SungHo Kim<sup>\*</sup>, Nayeon Kim<sup>\*</sup>, Taehee Jeon, SangKeun Lee*
 
 
