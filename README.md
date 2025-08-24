@@ -162,6 +162,32 @@ Special thanks to **Charlie** for his valuable insights in distinguishing betwee
 </br></br>
 
 
+## Citation
+```bibtex
+@inproceedings{kim-etal-2025-polishing,
+    title = "Polishing Every Facet of the {GEM}: Testing Linguistic Competence of {LLM}s and Humans in {K}orean",
+    author = "Kim, SungHo  and
+      Kim, Nayeon  and
+      Jeon, Taehee  and
+      Lee, SangKeun",
+    editor = "Che, Wanxiang  and
+      Nabende, Joyce  and
+      Shutova, Ekaterina  and
+      Pilehvar, Mohammad Taher",
+    booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.acl-long.492/",
+    doi = "10.18653/v1/2025.acl-long.492",
+    pages = "9955--9984",
+    ISBN = "979-8-89176-251-0",
+    abstract = "We introduce the $\underline{Ko}rean \underline{G}rammar \underline{E}valuation Bench\underline{M}ark (KoGEM)$, designed to assess the linguistic competence of LLMs and humans in Korean. KoGEM consists of 1.5k multiple-choice QA pairs covering five main categories and 16 subcategories. The zero-shot evaluation of 27 LLMs of various sizes and types reveals that while LLMs perform remarkably well on straightforward tasks requiring primarily definitional knowledge, they struggle with tasks that demand the integration of real-world experiential knowledge, such as phonological rules and pronunciation. Furthermore, our in-depth analysis suggests that incorporating such experiential knowledge could enhance the linguistic competence of LLMs. With KoGEM, we not only highlight the limitations of current LLMs in linguistic competence but also uncover hidden facets of LLMs in linguistic competence, paving the way for enhancing comprehensive language understanding. Our code and dataset are available at: https://github.com/SungHo3268/KoGEM."
+}
+```
+</br></br>
+
 ## License
 This work is licensed under a [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
 
