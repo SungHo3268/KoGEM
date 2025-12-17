@@ -1,4 +1,4 @@
-# Polishing Every Facet of the GEM: Testing Linguistic Competence of LLMs and Humans in Korean
+# Testing Linguistic Competence of LLMs and Humans in Korean
 
 [![CC BY 4.0][cc-by-shield]][cc-by]
 [![KOGL TYPE 1][kogl-1-shield]][kogl-1]
