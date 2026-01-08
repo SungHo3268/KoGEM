@@ -22,7 +22,7 @@
 [acl-paper-shield]: https://img.shields.io/badge/📋.-%20ACL_Paper%20-red.svg
 [acl-paper]: https://aclanthology.org/2025.acl-long.492/
 
-This paper is accepted to ACL 2025 main.
+This paper is accepted to ACL 2025 main.<br/>
 *SungHo Kim<sup>\*</sup>, Nayeon Kim<sup>\*</sup>, Taehee Jeon, SangKeun Lee*
 
 
